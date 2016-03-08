@@ -11,6 +11,7 @@
         <script src="../static/jquery.js"></script>
         <script src="../static/bootstrap.min.js"></script>
         <script src="../static/scripts.js"></script>
+        <script src="../static/bootstrap-formhelpers.js"></script>
 
         <!-- CSS -->
         <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto:400,100,300,500">
@@ -18,9 +19,10 @@
         <link rel="stylesheet" href="../static/font-awesome.min.css">
 		<link rel="stylesheet" href="../static/form-elements_lr.css">
         <link rel="stylesheet" href="../static/login_register_style.css">
+        <link rel="stylesheet" href="../static/bootstrap-formhelpers.css">
 
         <!-- Favicon and touch icons -->
-        <link rel="shortcut icon" href="../static/favicon.png">
+
         <link rel="apple-touch-icon-precomposed" sizes="144x144" href="../static/apple-touch-icon-144-precomposed.png">
         <link rel="apple-touch-icon-precomposed" sizes="114x114" href="../static/apple-touch-icon-114-precomposed.png">
         <link rel="apple-touch-icon-precomposed" sizes="72x72" href="../static/apple-touch-icon-72-precomposed.png">
@@ -89,13 +91,16 @@
 	                            </div>
 	                            <div class="form-bottom">
 				                    <form role="form" action="" method="post" class="login-form">
+                                        {% if error %}
+                                            <p class=error><strong>Error:</strong> {{ error }}
+                                        {% endif %}
 				                    	<div class="form-group">
 				                    		<label class="sr-only" for="form-username">Username</label>
-				                        	<input type="text" name="form-username" placeholder="Username..." class="form-username form-control" id="form-username">
+				                        	<input type="text" name="username" placeholder="Username..." class="form-username form-control" id="username">
 				                        </div>
 				                        <div class="form-group">
 				                        	<label class="sr-only" for="form-password">Password</label>
-				                        	<input type="password" name="form-password" placeholder="Password..." class="form-password form-control" id="form-password">
+				                        	<input type="password" name="password" placeholder="Password..." class="form-password form-control" id="password">
 				                        </div>
 				                        <button type="submit" class="btn">Sign in!</button>
 				                    </form>
@@ -120,23 +125,51 @@
 	                        		</div>
 	                            </div>
 	                            <div class="form-bottom">
+                                    {% if error %}
+                                            <p class=error><strong>Error:</strong> {{ error }}
+                                    {% endif %}
+                                    {% if message %}
+                                            <p class=message><strong>Message:</strong> {{ message }}
+                                    {% endif %}
 				                    <form role="form" action="" method="post" class="registration-form">
 				                    	<div class="form-group">
 				                    		<label class="sr-only" for="form-first-name">First name</label>
-				                        	<input type="text" name="form-first-name" placeholder="First name..." class="form-first-name form-control" id="form-first-name">
+				                        	<input type="text" name="first-name" placeholder="First name..." class="form-first-name form-control" id="first-name">
 				                        </div>
-				                        <div class="form-group">
+                                        <div class="form-group">
 				                        	<label class="sr-only" for="form-last-name">Last name</label>
-				                        	<input type="text" name="form-last-name" placeholder="Last name..." class="form-last-name form-control" id="form-last-name">
+				                        	<input type="text" name="last-name" placeholder="Last name..." class="form-last-name form-control" id="last-name">
 				                        </div>
-				                        <div class="form-group">
+                                        <div class="form-group">
 				                        	<label class="sr-only" for="form-email">Email</label>
-				                        	<input type="text" name="form-email" placeholder="Email..." class="form-email form-control" id="form-email">
+				                        	<input type="text" name="email" placeholder="Email..." class="form-email form-control" id="email">
+				                        </div>
+                                        <div class="form-group">
+				                    		<label class="sr-only" for="username">Username</label>
+				                        	<input type="text" name="username" placeholder="Username" class="form-control" id="username">
+				                        </div>
+                                        <div class="form-group">
+				                        	<label class="sr-only" for="form-password">Password</label>
+				                        	<input type="password" name="password" placeholder="Password..." class="form-password form-control" id="password">
+				                        </div>
+                                        <div class="form-group">
+				                    		<label class="radio-inline"><input type="radio" name="male">M</label>
+                                            <label class="radio-inline"><input type="radio" name="female">F</label>
+				                        </div>
+                                        <div class="form-group">
+				                    		<label class="sr-only" for="birth-date">Data de Nascimento YYYY-MM-DD</label>
+				                        	<input type="text" name="birth-date" placeholder="Data de Nascimento YYYY-MM-DD" class="form form-control" id="birth-date">
+				                        </div>
+                                        <div class="form-group">
+				                    		<select class="input-medium bfh-countries" data-country="US" name="country"></select>
 				                        </div>
 				                        <div class="form-group">
-				                        	<label class="sr-only" for="form-about-yourself">About yourself</label>
-				                        	<textarea name="form-about-yourself" placeholder="About yourself..." 
-				                        				class="form-about-yourself form-control" id="form-about-yourself"></textarea>
+				                    		<label class="sr-only" for="district">District</label>
+				                        	<input type="text" name="district" placeholder="Distrito..." class="form-control" id="district">
+				                        </div>
+                                        <div class="form-group">
+				                    		<label class="sr-only" for="conselho">Conselho</label>
+				                        	<input type="text" name="conselho" placeholder="Conselho..." class="form-control" id="conselho">
 				                        </div>
 				                        <button type="submit" class="btn">Sign me up!</button>
 				                    </form>

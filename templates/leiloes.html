@@ -45,12 +45,19 @@
                     <li>
                         <a href={{ url_for('leiloes') }}>Leilões</a>
                     </li>
-                    <li>
-                        <a href={{ url_for('register') }}>Register</a>
-                    </li>
+                    {% if not session_user_name %}
+                        <li>
+                            <a href={{ url_for('register') }}>Register</a>
+                        </li>
+                    {% endif %}
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
-                    <li><a href={{ url_for('login') }}>Login</a></li>
+                    {% if session_user_name %}
+                        <p>Hello <b>{{ session_user_name }}</b></p>
+                        <a href="{{ url_for('logout') }}">Logout</a>
+                    {% else %}
+                        <li><a href={{ url_for('login') }}>Login</a></li>
+                    {% endif %}
                 </ul>
             </div>
             <!-- /.navbar-collapse -->
