@@ -7,10 +7,10 @@ app = Flask(__name__)
 mysql = MySQL()
 
 # MySQL configurations
-app.config['MYSQL_DATABASE_USER'] = 'root'
-app.config['MYSQL_DATABASE_PASSWORD'] = 'halflife2'
-app.config['MYSQL_DATABASE_DB'] = 'asw'
-app.config['MYSQL_DATABASE_HOST'] = 'localhost'
+app.config['MYSQL_DATABASE_USER'] = 'asw44285'
+app.config['MYSQL_DATABASE_PASSWORD'] = 'asw44285'
+app.config['MYSQL_DATABASE_DB'] = 'asw44285'
+app.config['MYSQL_DATABASE_HOST'] = 'appserver.di.fc.ul.pt'
 mysql.init_app(app)
 
 conn = mysql.connect()
@@ -77,22 +77,24 @@ def register():
         cur.execute(querie, [info["email"], info["username"]])
 
         if cur.fetchall() == ():
-            try:
-                querie_get_max_id = "SELECT MAX(user_id)+1 from utilizadores"
-                if cur.execute(querie_get_max_id) == 1:
-                    max_id = cur.fetchone()[0]
+            #try:
+            querie_get_max_id = "SELECT MAX(user_id)+1 from utilizadores"
+            if cur.execute(querie_get_max_id) == 1:
+                max_id = cur.fetchone()[0]
+                if max_id == None:
+                    max_id = 1
 
-                querie_regist_password = "INSERT INTO `palavraschave` VALUES (%s, '%s');" % (max_id, info["password"])
-                if cur.execute(querie_regist_password) == 1:
+            querie_regist_password = "INSERT INTO `palavraschave` VALUES (%s, '%s');" % (max_id, info["password"])
+            if cur.execute(querie_regist_password) == 1:
 
-                    querie_regist_user = "INSERT INTO `utilizadores` VALUES (%s, '%s', '%s', '%s', '%s', '%s', '%s', '%s', '', '%s');" \
-                                         % (max_id, info["username"], info["first_name"], info["last_name"], info["email"],
-                                            info["country"], info["conselho"], info["district"], info["birth_date"])
-                    if cur.execute(querie_regist_user) == 1:
-                        conn.commit()
-                        return render_template("register.html", message="Regist was done good, please login!")
-            except:
-                error = "Problem talking to the database :("
+                querie_regist_user = "INSERT INTO `utilizadores` VALUES (%s, '%s', '%s', '%s', '%s', '%s', '%s', '%s', '', '%s');" \
+                                     % (max_id, info["username"], info["first_name"], info["last_name"], info["email"],
+                                        info["country"], info["conselho"], info["district"], info["birth_date"])
+                if cur.execute(querie_regist_user) == 1:
+                    conn.commit()
+                    return render_template("register.html", message="Regist was done good, please login!")
+            #except:
+                #error = "Problem talking to the database :("
         else:
             error = "This email already exists. Please login."
 
