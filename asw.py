@@ -4,6 +4,9 @@ from bs4 import BeautifulSoup
 import time
 
 app = Flask(__name__)
+app.config['DEBUG'] = True
+app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
+app.config['SESSION_TYPE'] = 'memcached'
 
 mysql = MySQL()
 
@@ -118,5 +121,4 @@ def admin():
     return render_template("admin.html")
 
 if __name__ == '__main__':
-    app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
     app.run(debug=True)
