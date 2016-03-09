@@ -34,21 +34,25 @@ def login():
         password_form  = request.form['password']
         try:
             cur.execute("SELECT nick FROM utilizadores WHERE nick = %s;", [username_form]) # CHECKS IF USERNAME EXSIST
-            if cur.fetchone()[0]:
-
-                cur.execute("SELECT user_id FROM utilizadores WHERE nick = %s;", [username_form])
-                user_id = cur.fetchone()[0]
-
-                cur.execute("SELECT pal_chave FROM palavraschave WHERE item_id = %s;", (user_id,))
-                if password_form == cur.fetchone()[0]:
-                    session["username"] = username_form
-                    flash("You logged in successfully, redirecting...!")
-                    time.sleep(2)
-                    return redirect(url_for('leiloes'))
-                else:
-                    error = "Invalid Username or Password"
         except:
-            error="TALKING TO DB SUCKED"
+            error = "first command berrou"
+        if cur.fetchone()[0]:
+            try:
+                cur.execute("SELECT user_id FROM utilizadores WHERE nick = %s;", [username_form])
+            except:
+                error = "second command berrou"
+            user_id = cur.fetchone()[0]
+            try:
+                cur.execute("SELECT pal_chave FROM palavraschave WHERE item_id = %s;", (user_id,))
+            except:
+                error = "third command berrou"
+            if password_form == cur.fetchone()[0]:
+                session["username"] = username_form
+                flash("You logged in successfully, redirecting...!")
+                time.sleep(2)
+                return redirect(url_for('leiloes'))
+            else:
+                error = "Invalid Username or Password"
         else:
             error = "Invalid Username or Password"
     return render_template('login.html', error=error)
