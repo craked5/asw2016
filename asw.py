@@ -1,12 +1,10 @@
 from flask import Flask, render_template, request, session, redirect, escape, url_for, flash
 from flask.ext.mysql import MySQL
 from bs4 import BeautifulSoup
-import time
 
 app = Flask(__name__)
 
 mysql = MySQL()
-
 
 # MySQL configurations
 app.config['MYSQL_DATABASE_USER'] = 'root'
@@ -104,6 +102,10 @@ def register():
 def logout():
     session.pop('username', None)
     return redirect(url_for('leiloes'))
+
+@app.route('/admin')
+def admin():
+    return render_template("admin.html")
 
 if __name__ == '__main__':
     app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'

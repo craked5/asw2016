@@ -1,3 +1,9 @@
-import pymysql
+import records
 
-db_conn = pymysql.connect(host='localhost', user='admin', password='halflife2', db='asw')
+class dbutils:
+
+    def __init__(self):
+        db = records.Database('mysql://...')
+        rows = db.query('select * from active_users')
+
+
