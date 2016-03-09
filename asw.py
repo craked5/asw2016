@@ -1,6 +1,7 @@
-from flask import Flask, render_template, request, session, redirect, escape, url_for
+from flask import Flask, render_template, request, session, redirect, escape, url_for, flash
 from flask.ext.mysql import MySQL
 from bs4 import BeautifulSoup
+import time
 
 app = Flask(__name__)
 
@@ -17,15 +18,6 @@ mysql.init_app(app)
 conn = mysql.connect()
 cur = conn.cursor()
 
-
-querie = "INSERT INTO `utilizadores` " \
-                "(`user_id`, `nick`, `nome`, `apelido`, `email`, `pais`, `concelho`, `distrito`, `foto`, `data_reg`, `password`) " \
-                "VALUES ('MAX(user_id)+1', %s, %s, %s, %s, %s, %s, %s, %s, %s);"
-args = ("dwada", "dwadwda", "dwadawda", "dwdawdaw",
-        "dwadwd", "fefefs", "dwfegregsgrg", "", "2016-03-29", "dpwadwd",)
-cur.execute(querie, args)
-print cur.fetchall()
-
 @app.route('/')
 def leiloes():
     if 'username' in session:
@@ -41,18 +33,23 @@ def login():
     if request.method == 'POST':
         username_form  = request.form['username']
         password_form  = request.form['password']
+
         cur.execute("SELECT nick FROM utilizadores WHERE nick = %s;", [username_form]) # CHECKS IF USERNAME EXSIST
         if cur.fetchone()[0]:
-            cur.execute("SELECT password FROM utilizadores WHERE password = %s;", [password_form]) # FETCH THE HASHED PASSWORD
-            for row in cur.fetchall():
-                if password_form == row[0]:
-                    session['username'] = request.form['username']
-                    return redirect(url_for('leiloes'))
-                else:
-                    error = "Invalid Username or Password"
+
+            cur.execute("SELECT user_id FROM utilizadores WHERE nick = %s;", [username_form])
+            user_id = cur.fetchone()[0]
+
+            cur.execute("SELECT pal_chave FROM palavraschave WHERE item_id = %s;", (user_id,))
+            if password_form == cur.fetchone()[0]:
+                session["username"] = username_form
+                flash("You logged in successfully!")
+                return redirect(url_for('leiloes'))
+            else:
+                error = "Invalid Username or Password"
         else:
             error = "Invalid Username or Password"
-    return render_template('login_register.html', error=error)
+    return render_template('login.html', error=error)
 
 @app.route('/register', methods=["GET", "POST"])
 def register():
@@ -64,7 +61,6 @@ def register():
     if request.method == 'POST':
         info["username"] = request.form['username']
         info["email"] = request.form['email']
-        print request.form['password']
         info["password"] = request.form['password']
         info["first_name"] = request.form['first-name']
         info["last_name"] = request.form['last-name']
@@ -77,26 +73,32 @@ def register():
         for key in info:
             if bool(BeautifulSoup(info[key], "html.parser").find()):
                 error = "A info em " + str(key) + " e ma!"
-                return render_template('login_register.html', error=error)
+                return render_template('register.html', error=error)
 
-        querie = "SELECT email FROM utilizadores WHERE email = %s or nick = %s;"
+        querie = "SELECT nick FROM utilizadores WHERE email = %s or nick = %s;"
         cur.execute(querie, [info["email"], info["username"]])
-        print cur.fetchone()
+
         if cur.fetchall() == ():
+            try:
+                querie_get_max_id = "SELECT MAX(user_id)+1 from utilizadores"
+                if cur.execute(querie_get_max_id) == 1:
+                    max_id = cur.fetchone()[0]
 
-            querie = "INSERT INTO `utilizadores` " \
-                "(`user_id`, `nick`, `nome`, `apelido`, `email`, `pais`, `concelho`, `distrito`, `foto`, `data_reg`, `password`) " \
-                "VALUES ('MAX(user_id)+1', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s');"
-            args = (info["username"], info["first_name"], info["last_name"], info["email"],
-                    info["country"], info["conselho"], info["district"], None, info["birth_date"], info["password"])
+                querie_regist_password = "INSERT INTO `palavraschave` VALUES (%s, '%s');" % (max_id, info["password"])
+                if cur.execute(querie_regist_password) == 1:
 
-            cur.execute(querie, args)
-            if conn.commit():
-                return render_template("login_register.html", message="Regist was done good")
+                    querie_regist_user = "INSERT INTO `utilizadores` VALUES (%s, '%s', '%s', '%s', '%s', '%s', '%s', '%s', '', '%s');" \
+                                         % (max_id, info["username"], info["first_name"], info["last_name"], info["email"],
+                                            info["country"], info["conselho"], info["district"], info["birth_date"])
+                    if cur.execute(querie_regist_user) == 1:
+                        conn.commit()
+                        return render_template("register.html", message="Regist was done good, please login!")
+            except:
+                error = "Problem talking to the database :("
         else:
             error = "This email already exists. Please login."
 
-    return render_template('login_register.html', error=error)
+    return render_template('register.html', error=error)
 
 @app.route('/logout')
 def logout():
@@ -105,4 +107,4 @@ def logout():
 
 if __name__ == '__main__':
     app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
-    app.run()
+    app.run(debug=True)
