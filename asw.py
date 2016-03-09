@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, session, redirect, escape, url_for, flash
 from flask.ext.mysql import MySQL
 from bs4 import BeautifulSoup
+import time
 
 app = Flask(__name__)
 
@@ -31,20 +32,23 @@ def login():
     if request.method == 'POST':
         username_form  = request.form['username']
         password_form  = request.form['password']
+        try:
+            cur.execute("SELECT nick FROM utilizadores WHERE nick = %s;", [username_form]) # CHECKS IF USERNAME EXSIST
+            if cur.fetchone()[0]:
 
-        cur.execute("SELECT nick FROM utilizadores WHERE nick = %s;", [username_form]) # CHECKS IF USERNAME EXSIST
-        if cur.fetchone()[0]:
+                cur.execute("SELECT user_id FROM utilizadores WHERE nick = %s;", [username_form])
+                user_id = cur.fetchone()[0]
 
-            cur.execute("SELECT user_id FROM utilizadores WHERE nick = %s;", [username_form])
-            user_id = cur.fetchone()[0]
-
-            cur.execute("SELECT pal_chave FROM palavraschave WHERE item_id = %s;", (user_id,))
-            if password_form == cur.fetchone()[0]:
-                session["username"] = username_form
-                flash("You logged in successfully!")
-                return redirect(url_for('leiloes'))
-            else:
-                error = "Invalid Username or Password"
+                cur.execute("SELECT pal_chave FROM palavraschave WHERE item_id = %s;", (user_id,))
+                if password_form == cur.fetchone()[0]:
+                    session["username"] = username_form
+                    flash("You logged in successfully, redirecting...!")
+                    time.sleep(2)
+                    return redirect(url_for('leiloes'))
+                else:
+                    error = "Invalid Username or Password"
+        except:
+            error="TALKING TO DB SUCKED"
         else:
             error = "Invalid Username or Password"
     return render_template('login.html', error=error)
