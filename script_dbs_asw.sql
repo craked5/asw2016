@@ -7,7 +7,8 @@ DROP TABLE IF EXISTS perguntas;
 
 
 CREATE TABLE utilizadores(
-	user_id		INT 		PRIMARY KEY AUTO_INCREMENT,
+	user_id   INT 		PRIMARY KEY AUTO_INCREMENT,
+	admin   tinyint(1) DEFAULT 0,
 	nick		CHAR(12)	UNIQUE,
 	nome		VARCHAR(32) NOT NULL,
 	apelido		VARCHAR(32) NOT NULL,

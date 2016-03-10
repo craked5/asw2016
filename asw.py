@@ -1,6 +1,8 @@
 from flask import Flask, render_template, request, session, redirect, escape, url_for, flash
 from flask.ext.mysql import MySQL
+from werkzeug.security import generate_password_hash, check_password_hash
 from bs4 import BeautifulSoup
+import db_utils_flask
 import time
 
 app = Flask(__name__)
@@ -11,10 +13,10 @@ app.config['SESSION_TYPE'] = 'memcached'
 mysql = MySQL()
 
 # MySQL configurations
-app.config['MYSQL_DATABASE_USER'] = 'asw44285'
-app.config['MYSQL_DATABASE_PASSWORD'] = 'asw44285'
-app.config['MYSQL_DATABASE_DB'] = 'asw44285'
-app.config['MYSQL_DATABASE_HOST'] = 'appserver.di.fc.ul.pt'
+app.config['MYSQL_DATABASE_USER'] = 'admin'
+app.config['MYSQL_DATABASE_PASSWORD'] = 'halflife2'
+app.config['MYSQL_DATABASE_DB'] = 'asw'
+app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 mysql.init_app(app)
 
 conn = mysql.connect()
@@ -35,29 +37,14 @@ def login():
     if request.method == 'POST':
         username_form  = request.form['username']
         password_form  = request.form['password']
-        try:
-            cur.execute("SELECT nick FROM utilizadores WHERE nick = %s;", [username_form]) # CHECKS IF USERNAME EXSIST
-        except:
-            error = "first command berrou"
-        if cur.fetchone()[0]:
-            try:
-                cur.execute("SELECT user_id FROM utilizadores WHERE nick = %s;", [username_form])
-            except:
-                error = "second command berrou"
-            user_id = cur.fetchone()[0]
-            try:
-                cur.execute("SELECT pal_chave FROM palavraschave WHERE item_id = %s;", (user_id,))
-            except:
-                error = "third command berrou"
-            if password_form == cur.fetchone()[0]:
-                session["username"] = username_form
-                flash("You logged in successfully, redirecting...!")
-                time.sleep(2)
-                return redirect(url_for('leiloes'))
-            else:
-                error = "Invalid Username or Password"
-        else:
-            error = "Invalid Username or Password"
+
+        l_res = db_utils_flask.login(cur, username_form, password_form)
+        error= l_res
+        if l_res is True:
+            session["username"] = username_form
+            flash("You logged in successfully, redirecting...!")
+            return redirect(url_for('leiloes'))
+
     return render_template('login.html', error=error)
 
 @app.route('/register', methods=["GET", "POST"])
@@ -98,7 +85,7 @@ def register():
             querie_regist_password = "INSERT INTO `palavraschave` VALUES (%s, '%s');" % (max_id, info["password"])
             if cur.execute(querie_regist_password) == 1:
 
-                querie_regist_user = "INSERT INTO `utilizadores` VALUES (%s, '%s', '%s', '%s', '%s', '%s', '%s', '%s', '', '%s');" \
+                querie_regist_user = "INSERT INTO `utilizadores` VALUES (%s, 0, '%s', '%s', '%s', '%s', '%s', '%s', '%s', '', '%s');" \
                                      % (max_id, info["username"], info["first_name"], info["last_name"], info["email"],
                                         info["country"], info["conselho"], info["district"], info["birth_date"])
                 if cur.execute(querie_regist_user) == 1:
@@ -116,9 +103,58 @@ def logout():
     session.pop('username', None)
     return redirect(url_for('leiloes'))
 
-@app.route('/admin')
+@app.route('/admin', methods=["GET", "POST"])
 def admin():
-    return render_template("admin.html")
+    error = None
+    if 'username' in session:
+        if db_utils_flask.is_admin(cur, session['username']) == 1:
+            return redirect(url_for('admin_logged'))
+        else:
+            return redirect(url_for("leiloes"))
+
+    if request.method == 'POST':
+        username_form = request.form['username']
+        password_form = request.form['password']
+        if db_utils_flask.is_admin(cur, username_form) == 1:
+            l_res = db_utils_flask.login(cur, username_form, password_form)
+            error= l_res
+            if l_res is True:
+                session["username"] = username_form
+                flash("You logged in successfully, redirecting...!")
+                time.sleep(2)
+                return redirect(url_for('admin_logged'))
+        else:
+            error="Your are not an Admin!"
+
+    return render_template('admin.html', error=error)
+
+@app.route("/admin_logged", methods=["GET", "POST"])
+def admin_logged():
+    error = None
+    res = ''
+    message = ''
+
+    if 'username' in session:
+        if db_utils_flask.is_admin(cur, session["username"]) == 1:
+            if request.method == 'POST':
+                username_email  = request.form['username_email']
+                res = db_utils_flask.search_user(cur, username_email)
+
+                if res != False:
+                    for index, key in enumerate(res):
+                        message += str(res[index]) + '\n\n\n'
+                else:
+                    message = "O username ou email inserido nao existe!"
+
+                return render_template("admin_logged.html", message=message)
+
+            username_session = escape(session['username']).capitalize()
+            return render_template('admin_logged.html', session_user_name=username_session)
+        else:
+            return redirect(url_for("leiloes"))
+
+    error= "NOT ADMIN!"
+    return redirect(url_for('leiloes'))
 
 if __name__ == '__main__':
     app.run(debug=True)

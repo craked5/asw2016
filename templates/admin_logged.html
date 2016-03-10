@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+
+    <head>
+
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Leilões Fantásticos &amp;</title>
+
+        <script src="../static/jquery.js"></script>
+        <script src="../static/bootstrap.min.js"></script>
+        <script src="../static/scripts.js"></script>
+        <script src="../static/bootstrap-formhelpers.js"></script>
+
+        <!-- CSS -->
+        <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto:400,100,300,500">
+        <link rel="stylesheet" href="../static/bootstrap.min.css">
+        <link rel="stylesheet" href="../static/font-awesome.min.css">
+		<link rel="stylesheet" href="../static/form-elements_lr.css">
+        <link rel="stylesheet" href="../static/login_register_style.css">
+        <link rel="stylesheet" href="../static/bootstrap-formhelpers.css">
+
+        <!-- Favicon and touch icons -->
+
+        <link rel="apple-touch-icon-precomposed" sizes="144x144" href="../static/apple-touch-icon-144-precomposed.png">
+        <link rel="apple-touch-icon-precomposed" sizes="114x114" href="../static/apple-touch-icon-114-precomposed.png">
+        <link rel="apple-touch-icon-precomposed" sizes="72x72" href="../static/apple-touch-icon-72-precomposed.png">
+        <link rel="apple-touch-icon-precomposed" href="../static/apple-touch-icon-57-precomposed.png">
+
+    </head>
+
+    <body>
+        <!-- Navigation -->
+        <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+            <div class="container">
+                <!-- Brand and toggle get grouped for better mobile display -->
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" >Leilões Fantásticos</a>
+                </div>
+                <!-- Collect the nav links, forms, and other content for toggling -->
+                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                    <ul class="nav navbar-nav">
+                        <li>
+                            <a href={{ url_for('leiloes') }}>Leilões</a>
+                        </li>
+                        {% if not session_user_name %}
+                            <li>
+                                <a href={{ url_for('register') }}>Register</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                    <ul class="nav navbar-nav navbar-right">
+                        {% if session_user_name %}
+                            <a>Hello {{ session_user_name }}</a>
+                            <br>
+                            <a href="{{ url_for('logout') }}"><span>Logout</span></a>
+                        {% else %}
+                            <li><a href={{ url_for('login') }}>Login</a></li>
+                        {% endif %}
+                    </ul>
+                </div>
+                <!-- /.navbar-collapse -->
+            </div>
+            <!-- /.container -->
+        </nav>
+        <!-- Top content -->
+        <div class="top-content">
+            <div class="inner-bg">
+                <div class="container">
+
+                    <div class="row">
+                        <div class="col-sm-8 col-sm-offset-2 text">
+                            <h1><strong>Welcome ADMIN!!</strong>
+                                <br>
+                            </h1>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4"></div>
+                        <div class="col-md-4">
+                            <div class="form-box">
+                                <div class="form-top">
+                                    <div class="form-top-left">
+                                        <h3>Search for a user here!</h3>
+                                        <p>Enter a nickname or an email:</p>
+                                    </div>
+                                    <div class="form-top-right">
+                                        <i class="fa fa-key"></i>
+                                    </div>
+                                </div>
+                                <div class="form-bottom">
+                                    <form role="form" action="" method="post" class="login-form">
+                                        {% if error %}
+                                            <p class=error><strong>Error:</strong> {{ error }}
+                                        {% endif %}
+                                        <div class="form-group">
+                                            <label class="sr-only" for="form-username">Search Username</label>
+                                            <input type="text" name="username_email" placeholder="Type Username or Email..." class="form-username form-control" id="username_email">
+                                        </div>
+                                        <button type="submit" class="btn">Search!</button>
+                                    </form>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="col-md-4">
+                            {% if message %}
+                                <p class=message><strong>Message:</strong>
+                                    <br>
+                                    {{ message }}
+                                </p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Footer -->
+        <footer>
+        	<div class="container">
+        		<div class="row">
+
+        			<div class="col-sm-8 col-sm-offset-2">
+        				<div class="footer-border"></div>
+        				<p>Made by group X with fun! <i class="fa fa-smile-o"></i></p>
+        			</div>
+
+        		</div>
+        	</div>
+        </footer>
+
+    </body>
+
+</html>
