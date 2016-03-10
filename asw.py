@@ -13,10 +13,10 @@ app.config['SESSION_TYPE'] = 'memcached'
 mysql = MySQL()
 
 # MySQL configurations
-app.config['MYSQL_DATABASE_USER'] = 'admin'
-app.config['MYSQL_DATABASE_PASSWORD'] = 'halflife2'
-app.config['MYSQL_DATABASE_DB'] = 'asw'
-app.config['MYSQL_DATABASE_HOST'] = 'localhost'
+app.config['MYSQL_DATABASE_USER'] = 'asw44285'
+app.config['MYSQL_DATABASE_PASSWORD'] = 'asw44285'
+app.config['MYSQL_DATABASE_DB'] = 'asw44285'
+app.config['MYSQL_DATABASE_HOST'] = 'appserver.di.fc.ul.pt'
 mysql.init_app(app)
 
 conn = mysql.connect()
