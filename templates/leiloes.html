@@ -22,10 +22,13 @@
 
     <!-- Bootstrap Core JavaScript -->
     <script src="../static/bootstrap.min.js"></script>
+
+    <!-- Slider JS -->
+    <script src="../static/slider.js"></script>
 </head>
 
-<body>
-
+<body onLoad="photoA()">
+<div class="largest-container">
     <!-- Navigation -->
     <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
         <div class="container">
@@ -37,7 +40,7 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand">Leilões Fantásticos</a>
+                <a class="navbar-brand"><img src="../Images/icon%20sold.png" width="165px" height="60px"></a>
             </div>
             <!-- Collect the nav links, forms, and other content for toggling -->
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
@@ -72,9 +75,43 @@
         <!-- Page Header -->
         <div class="row">
             <div class="col-lg-12">
-                <h1 class="page-header">Page Heading
-                    <small>Secondary Text</small>
-                </h1>
+                <h1 class="page-header">Leilões Fantásticos <br></h1>
+            </div>
+        </div>
+        <!-- /.row -->
+    <div id="slider">
+            <img src="../Images/img1.jpg" id="image" >
+            <div class="left_hold"><img onClick="photoA(-1)" class="left" src="../Images/arrow_left.png"></div>
+            <div class="right_hold"><img onClick="photoA(1)" class="right" src="../Images/arrow_right.png"></div>
+        </div>
+        <!-- Projects Row -->
+        <div class="row">
+            <div class="main_bid_page">
+                <h3 class="sub-header">Veja já os Leilões que estão a ocorrer neste preciso momento!</h3>
+            </div>
+
+        </div>
+        <!-- /.row -->
+
+        <!-- Projects Row -->
+        <div class="row">
+            <div class="col-md-6 portfolio-item">
+                <div id="image-wrapper">
+                   <img src="../Images/imgleilao1.png" class="hover">
+
+                    <!--meter hover nas images para o preço aparecer-->
+                </div>
+                <h3>
+                    <input id="bigbutton" type="submit" value="Bid Now!" />
+                </h3>
+            </div>
+            <div class="col-md-6 portfolio-item">
+                <a href="#">
+                    <img class="img-responsive" src="../Images/imgleilao2.png" alt="price check">
+                </a>
+                <h3>
+                    <input id="bigbutton" type="submit" value="Bid Now!" />
+                </h3>
             </div>
         </div>
         <!-- /.row -->
@@ -83,67 +120,19 @@
         <div class="row">
             <div class="col-md-6 portfolio-item">
                 <a href="#">
-                    <img class="img-responsive" src="http://placehold.it/700x400" alt="">
+                    <img class="img-responsive" src="../Images/imgleilao3.png" alt="price check">
                 </a>
                 <h3>
-                    <a href="#">Project One</a>
+                    <input id="bigbutton" type="submit" value="Bid Now!" />
                 </h3>
-                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam viverra euismod odio, gravida pellentesque urna varius vitae.</p>
             </div>
             <div class="col-md-6 portfolio-item">
                 <a href="#">
-                    <img class="img-responsive" src="http://placehold.it/700x400" alt="">
+                    <img class="img-responsive" src="../Images/imgleilao4.png" alt="price check">
                 </a>
                 <h3>
-                    <a href="#">Project Two</a>
+                    <input id="bigbutton" type="submit" value="Bid Now!" />
                 </h3>
-                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam viverra euismod odio, gravida pellentesque urna varius vitae.</p>
-            </div>
-        </div>
-        <!-- /.row -->
-
-        <!-- Projects Row -->
-        <div class="row">
-            <div class="col-md-6 portfolio-item">
-                <a href="#">
-                    <img class="img-responsive" src="http://placehold.it/700x400" alt="">
-                </a>
-                <h3>
-                    <a href="#">Project Three</a>
-                </h3>
-                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam viverra euismod odio, gravida pellentesque urna varius vitae.</p>
-            </div>
-            <div class="col-md-6 portfolio-item">
-                <a href="#">
-                    <img class="img-responsive" src="http://placehold.it/700x400" alt="">
-                </a>
-                <h3>
-                    <a href="#">Project Four</a>
-                </h3>
-                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam viverra euismod odio, gravida pellentesque urna varius vitae.</p>
-            </div>
-        </div>
-        <!-- /.row -->
-
-        <!-- Projects Row -->
-        <div class="row">
-            <div class="col-md-6 portfolio-item">
-                <a href="#">
-                    <img class="img-responsive" src="http://placehold.it/700x400" alt="">
-                </a>
-                <h3>
-                    <a href="#">Project Five</a>
-                </h3>
-                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam viverra euismod odio, gravida pellentesque urna varius vitae.</p>
-            </div>
-            <div class="col-md-6 portfolio-item">
-                <a href="#">
-                    <img class="img-responsive" src="http://placehold.it/700x400" alt="">
-                </a>
-                <h3>
-                    <a href="#">Project Six</a>
-                </h3>
-                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam viverra euismod odio, gravida pellentesque urna varius vitae.</p>
             </div>
         </div>
         <!-- /.row -->
@@ -186,7 +175,7 @@
         <footer>
             <div class="row">
                 <div class="col-lg-12">
-                    <p>Copyright &copy; Your Website 2014</p>
+                    <p>Copyright &copy; Asw 2016</p>
                 </div>
             </div>
             <!-- /.row -->
@@ -194,7 +183,7 @@
 
     </div>
     <!-- /.container -->
-
+</div>
 </body>
 
 </html>
