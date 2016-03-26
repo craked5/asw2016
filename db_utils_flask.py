@@ -59,3 +59,16 @@ def is_admin(cur, nick):
 
     cur.execute("SELECT admin FROM utilizadores WHERE nick = %s;", [nick])
     return cur.fetchone()[0]
+
+def is_user_auction(cur, nick, leilao_id):
+
+    cur.execute("SELECT user_id FROM utilizadores WHERE nick = %s;", [nick])
+    user_id = cur.fetchone()[0]
+
+    cur.execute("SELECT user_id FROM artigos WHERE leilao_id = %s;", [leilao_id])
+
+    if user_id == cur.fetchone()[0]:
+        return True
+    else:
+        return False
+

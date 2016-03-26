@@ -40,7 +40,7 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand"><img src="../Images/icon%20sold.png" width="165px" height="60px"></a>
+                <a class="navbar-brand"><img src="../static/icon%20sold.png" width="165px" height="60px"></a>
             </div>
             <!-- Collect the nav links, forms, and other content for toggling -->
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
@@ -50,7 +50,7 @@
                     </li>
                     {% if not session_user_name %}
                         <li>
-                            <a href={{ url_for('register') }}>Register</a>
+                            <a href="{{ url_for('register') }}">Register</a>
                         </li>
                     {% endif %}
                 </ul>
@@ -80,14 +80,14 @@
         </div>
         <!-- /.row -->
     <div id="slider">
-            <img src="../Images/img1.jpg" id="image" >
-            <div class="left_hold"><img onClick="photoA(-1)" class="left" src="../Images/arrow_left.png"></div>
-            <div class="right_hold"><img onClick="photoA(1)" class="right" src="../Images/arrow_right.png"></div>
+            <img src="../static/img1.jpg" id="image" >
+            <div class="left_hold"><img onClick="photoA(-1)" class="left" src="../static/arrow_left.png"></div>
+            <div class="right_hold"><img onClick="photoA(1)" class="right" src="../static/arrow_right.png"></div>
         </div>
         <!-- Projects Row -->
         <div class="row">
             <div class="main_bid_page">
-                <h3 class="sub-header">Veja já os Leilões que estão a ocorrer neste preciso momento!</h3>
+                <h3 class="sub-header">Veja os Leilões que estão a ocorrer neste preciso momento!</h3>
             </div>
 
         </div>
@@ -97,7 +97,7 @@
         <div class="row">
             <div class="col-md-6 portfolio-item">
                 <div id="image-wrapper">
-                   <img src="../Images/imgleilao1.png" class="hover">
+                   <img src="../static/imgleilao1.png" class="hover">
 
                     <!--meter hover nas images para o preço aparecer-->
                 </div>
@@ -107,7 +107,7 @@
             </div>
             <div class="col-md-6 portfolio-item">
                 <a href="#">
-                    <img class="img-responsive" src="../Images/imgleilao2.png" alt="price check">
+                    <img class="img-responsive" src="../static/imgleilao2.png" alt="price check">
                 </a>
                 <h3>
                     <input id="bigbutton" type="submit" value="Bid Now!" />
@@ -120,7 +120,7 @@
         <div class="row">
             <div class="col-md-6 portfolio-item">
                 <a href="#">
-                    <img class="img-responsive" src="../Images/imgleilao3.png" alt="price check">
+                    <img class="img-responsive" src="../static/imgleilao3.png" alt="price check">
                 </a>
                 <h3>
                     <input id="bigbutton" type="submit" value="Bid Now!" />
@@ -128,7 +128,7 @@
             </div>
             <div class="col-md-6 portfolio-item">
                 <a href="#">
-                    <img class="img-responsive" src="../Images/imgleilao4.png" alt="price check">
+                    <img class="img-responsive" src="../static/imgleilao4.png" alt="price check">
                 </a>
                 <h3>
                     <input id="bigbutton" type="submit" value="Bid Now!" />

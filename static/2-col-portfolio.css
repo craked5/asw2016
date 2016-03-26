@@ -5,7 +5,7 @@
  */
 
 .largest-container{
-	background: url("../Images/background2.jpg");
+	background: url("background2.jpg");
 	background-size: cover;
 }
 body {

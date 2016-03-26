@@ -68,7 +68,7 @@ def register():
 
         for key in info:
             if bool(BeautifulSoup(info[key], "html.parser").find()):
-                error = "A info em " + str(key) + " e ma!"
+                error = "HTML detetado em " + str(key)
                 return render_template('register.html', error=error)
 
         if db_utils_flask.register(conn, cur, info["username"], info["email"], info["password"], info["first_name"],
@@ -126,15 +126,47 @@ def admin_logged():
                 else:
                     message = "O username ou email inserido nao existe!"
 
-                return render_template("admin_logged.html", message=message)
+                return render_template("admin_logged.html", message=message, session_user_name = session['username'])
 
-            username_session = escape(session['username']).capitalize()
+            username_session = escape(session['username'])
             return render_template('admin_logged.html', session_user_name=username_session)
         else:
-            return redirect(url_for("leiloes"))
+            return redirect(url_for("leiloes", error="NOT ADMIN"))
 
-    error= "NOT ADMIN!"
     return redirect(url_for('leiloes'))
+
+@app.route("/leilao/<leilao_id>", methods=["GET", "POST"])
+def leilao(leilao_id):
+
+    if request.method == "POST":
+        pass
+
+
+    if db_utils_flask.is_user_auction(cur, session["username"], leilao_id):
+        render_template(leilao.html, is_user_auction = True, session_user_name = session["username"])
+    else:
+        render_template(leilao.html, session_user_name = session["username"])
+
+@app.route("/leiloar", methods=["GET", "POST"])
+def leilao():
+
+    if "username" in session:
+        if request.method == 'POST':
+            pass
+
+        render_template("leiloar.html", session_user_name = session["username"])
+
+@app.route("/profile", methods=["GET", "POST"])
+def profile():
+
+    if "username" in session:
+        if request.method == "POST":
+            pass
+
+        #TODO what info do i want to show here? return profile with that info
+        render_template("profile.html", )
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)
