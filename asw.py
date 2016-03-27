@@ -8,7 +8,9 @@ import time
 app = Flask(__name__)
 app.config['DEBUG'] = True
 app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
-app.config['SESSION_TYPE'] = 'memcached'
+app.config['SESSION_PERMANENT'] = False
+app.config['PERMANENT_SESSION_LIFETIME'] = 20000
+app.config['SESSION_TYPE'] = 'filesystem'
 
 mysql = MySQL()
 
@@ -26,8 +28,8 @@ cur = conn.cursor()
 def leiloes():
     if 'username' in session:
         username_session = escape(session['username']).capitalize()
-        return render_template('leiloes.html', session_user_name=username_session)
-    return render_template('leiloes.html')
+        return render_template('auctions.html', session_user_name=username_session)
+    return render_template('auctions.html')
 
 @app.route('/login', methods=["GET", "POST"])
 def login():
@@ -148,7 +150,7 @@ def leilao(leilao_id):
         render_template(leilao.html, session_user_name = session["username"])
 
 @app.route("/leiloar", methods=["GET", "POST"])
-def leilao():
+def leiloar():
 
     if "username" in session:
         if request.method == 'POST':
@@ -156,15 +158,15 @@ def leilao():
 
         render_template("leiloar.html", session_user_name = session["username"])
 
-@app.route("/profile", methods=["GET", "POST"])
+@app.route("/templates", methods=["GET", "POST"])
 def profile():
 
     if "username" in session:
         if request.method == "POST":
             pass
 
-        #TODO what info do i want to show here? return profile with that info
-        render_template("profile.html", )
+        #TODO what info do i want to show here? return templates with that info
+        render_template("templates.html", )
 
 
 

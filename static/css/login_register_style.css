@@ -1,6 +1,6 @@
 
 body {
-	background: url(bg.jpg) left top repeat;
+	background: url(../imagens/bg.jpg) left top repeat;
     font-family: 'Roboto', sans-serif;
     font-size: 16px;
     font-weight: 300;
@@ -83,7 +83,6 @@ img { max-width: 100%; }
 /***** Top content *****/
 
 .inner-bg {
-    padding: 60px 0 80px 0;
 }
 
 .top-content .description {
@@ -93,9 +92,6 @@ img { max-width: 100%; }
 .top-content .description a:hover, 
 .top-content .description a:focus { border-bottom: 1px dotted #19b9e7; }
 
-.form-box {
-	margin-top: 70px;
-}
 
 .form-top {
 	overflow: hidden;
