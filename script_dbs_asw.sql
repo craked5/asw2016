@@ -52,6 +52,13 @@ CREATE TABLE licitacoes(
 	CONSTRAINT pk_bids PRIMARY KEY (user_id, item_id, data_licit)
 ) ENGINE=INNODB;
 
+CREATE TABLE tags(
+	tag_id		INT,
+	user_id		INT REFERENCES utilizadores(user_id) ON DELETE CASCADE,
+	item_id 	INT REFERENCES artigos(item_id)  ON DELETE CASCADE,
+	CONSTRAINT pk_tags PRIMARY KEY (tag_id)
+) ENGINE=INNODB;
+
 CREATE TABLE perguntas(
 	user_id		INT REFERENCES utilizadores(user_id) ON DELETE CASCADE,
 	item_id 	INT REFERENCES artigos(item_id)  ON DELETE CASCADE,

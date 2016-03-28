@@ -9,6 +9,14 @@ body {
     text-align: center;
 }
 
+.row {
+	margin-top: -40px;
+}
+
+.navbar-nav {
+	font-weight: normal;
+}
+
 strong { font-weight: 500; }
 
 a, a:hover, a:focus {

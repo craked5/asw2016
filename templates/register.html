@@ -2,11 +2,10 @@
 <html lang="en">
 
     <head>
-
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Bootstrap Login &amp; Register Templates</title>
+        <title>Registo!</title>
 
         <script src="{{ url_for('static', filename='js/jquery.js') }}"></script>
         <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
@@ -31,31 +30,22 @@
     </head>
 
     <body>
-        <!-- Navigation -->
         <nav class="navbar" role="navigation">
             <div class="container">
                 <!-- Brand and toggle get grouped for better mobile display -->
-                <div class="navbar-header">
-                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
-                        <span class="sr-only">Toggle navigation</span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                    </button>
-                    <a class="navbar-brand" >Leilões Fantásticos</a>
-                </div>
+                <a class="navbar-brand">Leilões Fantásticos</a>
                 <!-- Collect the nav links, forms, and other content for toggling -->
                 <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                     <ul class="nav navbar-nav">
                         <li>
                             <a href={{ url_for('leiloes') }}>Leilões</a>
                         </li>
-                        <li>
-                            <a href={{ url_for('register') }}>Register</a>
-                        </li>
                     </ul>
                     <ul class="nav navbar-nav navbar-right">
                         <li><a href={{ url_for('login') }}>Login</a></li>
+                        <li>
+                            <a href={{ url_for('registo') }}>Registo</a>
+                        </li>
                     </ul>
                 </div>
                 <!-- /.navbar-collapse -->
@@ -69,37 +59,28 @@
                 	
                     <div class="row">
                         <div class="col-sm-8 col-sm-offset-2 text">
-                            <h1><strong>Welcome dear guest!</strong>
+                            <h1><strong>Bem vindo!</strong>
                                 <br>
-                                Please create a new account here!
+                                Cria uma conta aqui!
                             </h1>
                         </div>
                     </div>
                         	
                         	<div class="form-box">
-                        		<div class="form-top">
-	                        		<div class="form-top-left">
-	                        			<h3>Sign up now</h3>
-	                            		<p>Fill in the form below to get instant access:</p>
-	                        		</div>
-	                        		<div class="form-top-right">
-	                        			<i class="fa fa-pencil"></i>
-	                        		</div>
-	                            </div>
 	                            <div class="form-bottom">
                                     {% if error %}
-                                            <p class=error><strong>Error:</strong> {{ error }}
+                                            <p class=error><strong>Erro:</strong> {{ error }}
                                     {% endif %}
                                     {% if message %}
-                                            <p class=message><strong>Message:</strong> {{ message }}
+                                            <p class=message><strong>Mensagem:</strong> {{ message }}
                                     {% endif %}
 				                    <form role="form" action="" method="post" class="registration-form">
 				                    	<div class="form-group">
-				                    		<label class="sr-only" for="form-first-name">First name</label>
+				                    		<label class="sr-only" for="form-first-name">Primeiro Nome</label>
 				                        	<input type="text" name="first-name" placeholder="First name..." class="form-first-name form-control" id="first-name">
 				                        </div>
                                         <div class="form-group">
-				                        	<label class="sr-only" for="form-last-name">Last name</label>
+				                        	<label class="sr-only" for="form-last-name">Ultimo Nome</label>
 				                        	<input type="text" name="last-name" placeholder="Last name..." class="form-last-name form-control" id="last-name">
 				                        </div>
                                         <div class="form-group">
@@ -115,8 +96,8 @@
 				                        	<input type="password" name="password" placeholder="Password..." class="form-password form-control" id="password">
 				                        </div>
                                         <div class="form-group">
-				                    		<label class="radio-inline"><input type="radio" name="male">M</label>
-                                            <label class="radio-inline"><input type="radio" name="female">F</label>
+				                    		<label class="radio-inline"><input value="Male" type="radio" name="gender">M</label>
+                                            <label class="radio-inline"><input value="Female" type="radio" name="gender">F</label>
 				                        </div>
                                         <div class="form-group">
 				                    		<label class="sr-only" for="birth-date">Data de Nascimento YYYY-MM-DD</label>
@@ -126,14 +107,14 @@
 				                    		<select class="input-medium bfh-countries" data-country="US" name="country"></select>
 				                        </div>
 				                        <div class="form-group">
-				                    		<label class="sr-only" for="district">District</label>
+				                    		<label class="sr-only" for="district">Destrito</label>
 				                        	<input type="text" name="district" placeholder="Distrito..." class="form-control" id="district">
 				                        </div>
                                         <div class="form-group">
 				                    		<label class="sr-only" for="conselho">Conselho</label>
 				                        	<input type="text" name="conselho" placeholder="Conselho..." class="form-control" id="conselho">
 				                        </div>
-				                        <button type="submit" class="btn">Sign me up!</button>
+				                        <button type="submit" class="btn">Registo!</button>
 				                    </form>
 			                    </div>
                         	</div>
@@ -149,15 +130,11 @@
         <!-- Footer -->
         <footer>
         	<div class="container">
-        		<div class="row">
-        			
-        			<div class="col-sm-8 col-sm-offset-2">
-        				<div class="footer-border"></div>
-        				<p>Made by group X with fun! <i class="fa fa-smile-o"></i></p>
-        			</div>
+                <div class="col-sm-8 col-sm-offset-2">
+                    <p style="margin-top: 60px;">Made by group X with fun! <i class="fa fa-smile-o"></i></p>
+                </div>
         			
         		</div>
-        	</div>
         </footer>
 
     </body>

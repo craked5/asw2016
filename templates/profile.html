@@ -1,10 +1,141 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>{{ session_user_name }} Profile</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="{{ url_for('static', filename='css/2-col-portfolio.css') }}" rel="stylesheet">
+
+    <!-- jQuery -->
+    <script src="{{ url_for('static', filename='js/jquery.js') }}"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
 </head>
+
 <body>
+    <nav class="navbar" role="navigation">
+        <div class="container">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <a class="navbar-brand">Leilões Fantásticos</a>
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+                    {% if session_user_name %}
+                        <li>
+                            <a href={{ url_for('leiloes') }}>Leilões</a>
+                        </li>
+                        <li>
+                            <a href={{ url_for('leiloar') }}>Leiloar Novo Artigo</a>
+                        </li>
+                    {% else %}
+                        <li>
+                            <a href={{ url_for('leiloes') }}>Leilões</a>
+                        </li>
+                    {% endif %}
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    {% if session_user_name %}
+                        <li>
+                            <a href="{{ url_for('logout') }}"><span>Logout</span></a>
+                        </li>
+                        <li>
+                            <a href={{ url_for('perfil') }}>{{ session_user_name }}</a>
+                        </li>
+                    {% else %}
+                        <li><a href={{ url_for('login') }}>Login</a></li>
+                        <li>
+                            <a href={{ url_for('registo') }}>Registo</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>
+
+    <div class="panel panel-info">
+        <div class="panel-heading">
+        <h3 class="panel-title">{{ user_info[2] }} {{ user_info[3] }}</h3>
+        </div>
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-3 col-lg-3 " align="center"> <img alt="User Pic" src="http://babyinfoforyou.com/wp-content/uploads/2014/10/avatar-300x300.png" class="img-circle img-responsive"> </div>
+
+            <!--<div class="col-xs-10 col-sm-10 hidden-md hidden-lg"> <br>
+              <dl>
+                <dt>DEPARTMENT:</dt>
+                <dd>Administrator</dd>
+                <dt>HIRE DATE</dt>
+                <dd>11/12/2013</dd>
+                <dt>DATE OF BIRTH</dt>
+                   <dd>11/12/2013</dd>
+                <dt>GENDER</dt>
+                <dd>Male</dd>
+              </dl>
+            </div>-->
+                <div class=" col-md-9 col-lg-9 ">
+                  <table class="table table-user-information">
+                    <tbody>
+                      <tr>
+                        <td>User id:</td>
+                        <td>{{ user_info[0] }}</td>
+                      </tr>
+                      <tr>
+                        <td>Username:</td>
+                        <td>{{ user_info[2] }}</td>
+                      </tr>
+                      <tr>
+                        <td>Nome:</td>
+                        <td>{{ user_info[3] }} {{ user_info[4] }}</td>
+                      </tr>
+                      <tr>
+                        <td>Data de Nascimento:</td>
+                        <td>{{ user_info[10] }}</td>
+                      </tr>
+
+                         <tr>
+                             <tr>
+                        <td>Gender:</td>
+                        <td>Male</td>
+                      </tr>
+                        <tr>
+                        <td>Pais:</td>
+                        <td>{{ user_info[6] }}</td>
+                      </tr>
+                      <tr>
+                        <td>Conselho:</td>
+                        <td>{{ user_info[7] }}</td>
+                      </tr>
+                      <tr>
+                        <td>Distrito:</td>
+                        <td>{{ user_info[8] }}</td>
+                      </tr>
+                      <tr>
+                        <td>Email</td>
+                        <td><a href="mailto:info@support.com">{{ user_info[5] }}</a></td>
+                      </tr>
+
+                    </tbody>
+                  </table>
+
+                  <a href="#" class="btn btn-primary">Alterar a minha info</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
 
 </body>
 </html>

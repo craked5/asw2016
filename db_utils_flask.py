@@ -1,6 +1,11 @@
 from flask.ext.mysql import MySQL
 from werkzeug.security import generate_password_hash, check_password_hash
 
+
+def get_user_id(cur, nick):
+    cur.execute("SELECT user_id FROM utilizadores WHERE nick = %s;", [nick])
+    return cur.fetchone()[0]
+
 def login(cur, username, password):
 
     cur.execute("SELECT nick FROM utilizadores WHERE nick = %s;", [username]) # CHECKS IF USERNAME EXSIST
@@ -72,3 +77,54 @@ def is_user_auction(cur, nick, leilao_id):
     else:
         return False
 
+def get_user_info(cur, nick):
+
+    cur.execute("SELECT * FROM utilizadores WHERE nick = %s;", [nick])
+    return cur.fetchone()
+
+def get_user_auctions(cur, nick):
+
+    user_id = get_user_id(cur,nick)
+
+    cur.execute("SELECT * FROM artigos WHERE user_id = %s;", [user_id])
+    return cur.fetchall()
+
+def get_max_tag_id(cur):
+    querie_get_max_tag_id = "SELECT MAX(tag_id)+1 from tags"
+    if cur.execute(querie_get_max_tag_id) == 1:
+        max_id = cur.fetchone()[0]
+        if max_id == None:
+            max_id = 1
+            return max_id - 1
+        return max_id - 1
+
+def make_new_auction(conn, cur, nick, nome_artigo, desc_artigo, base_value, tags, initial_date, end_date):
+
+    max_auction_id = 0
+    user_id = get_user_id(cur,nick)
+
+    try:
+        querie_get_max_id = "SELECT MAX(item_id)+1 from artigos"
+        if cur.execute(querie_get_max_id) == 1:
+            max_auction_id = cur.fetchone()[0]
+            if max_auction_id == None:
+                max_auction_id = 1
+    except:
+        return "Error getting new id for an auction"
+
+    tags = tags.split(" ")
+    tag_id = get_max_tag_id(cur)
+
+    for index, tag in enumerate(tags):
+        tag_id += 1
+        querie_new_tags = "INSERT INTO `tags` VALUES (%s, %s, %s, '%s');" \
+            % (tag_id, max_auction_id, user_id, tags[index])
+        cur.execute(querie_new_tags)
+
+    querie_new_auction = "INSERT INTO `artigos` VALUES (%s, '%s', %s, %s, '%s', '%s', '%s', %s, %s);" \
+                         % (max_auction_id, nome_artigo, user_id, base_value, desc_artigo, initial_date, end_date, "NULL", "NULL")
+    if cur.execute(querie_new_auction) == 1:
+        conn.commit()
+        return True
+    else:
+        return False

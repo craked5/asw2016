@@ -2,7 +2,6 @@
 <html lang="en">
 
 <head>
-
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -30,28 +29,36 @@
     <nav class="navbar" role="navigation">
         <div class="container">
             <!-- Brand and toggle get grouped for better mobile display -->
-            <div class="navbar-header">
-                <a class="navbar-brand">Leilões Fantásticos</a>
-            </div>
+            <a class="navbar-brand">Leilões Fantásticos</a>
             <!-- Collect the nav links, forms, and other content for toggling -->
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav">
-                    <li>
-                        <a href={{ url_for('leiloes') }}>Leilões</a>
-                    </li>
-                    {% if not session_user_name %}
+                    {% if session_user_name %}
                         <li>
-                            <a href={{ url_for('register') }}>Register</a>
+                            <a href={{ url_for('leiloes') }}>Leilões</a>
+                        </li>
+                        <li>
+                            <a href={{ url_for('leiloar') }}>Leiloar Novo Artigo</a>
+                        </li>
+                    {% else %}
+                        <li>
+                            <a href={{ url_for('leiloes') }}>Leilões</a>
                         </li>
                     {% endif %}
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
                     {% if session_user_name %}
-                        <a>Hello {{ session_user_name }}</a>
-                            <br>
-                        <a href="{{ url_for('logout') }}"><span>Logout</span></a>
+                        <li>
+                            <a href="{{ url_for('logout') }}"><span>Logout</span></a>
+                        </li>
+                        <li>
+                            <a href={{ url_for('perfil') }}>{{ session_user_name }}</a>
+                        </li>
                     {% else %}
                         <li><a href={{ url_for('login') }}>Login</a></li>
+                        <li>
+                            <a href={{ url_for('registo') }}>Registo</a>
+                        </li>
                     {% endif %}
                 </ul>
             </div>
@@ -66,73 +73,73 @@
         <!-- Page Header -->
         <div class="row">
             <div class="col-lg-12">
-                <h1 class="page-header">Os Nossos magnificos leiloes!
+                <h1 class="page-header">Os Nossos magnificos leilões!
                 </h1>
             </div>
         </div>
         <!-- /.row -->
 
         <!-- Projects Row -->
-            <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 portfolio-item">
-                <a href="#">
-                    <img class="img-responsive" src="http://placehold.it/700x400" alt="">
-                </a>
-                <h3>
-                    <a href="#">Project One</a>
-                </h3>
-                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam viverra euismod odio, gravida pellentesque urna varius vitae.</p>
-            </div>
-            <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 portfolio-item">
-                <a href="#">
-                    <img class="img-responsive" src="http://placehold.it/700x400" alt="">
-                </a>
-                <h3>
-                    <a href="#">Project Two</a>
-                </h3>
-                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam viverra euismod odio, gravida pellentesque urna varius vitae.</p>
-            </div>
-        <!-- /.row -->
+        <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 portfolio-item">
+            <a href="#">
+                <img class="img-responsive" src="http://placehold.it/700x400" alt="">
+            </a>
+            <h3>
+                <a href="#">Project One</a>
+            </h3>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam viverra euismod odio, gravida pellentesque urna varius vitae.</p>
+        </div>
+        <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 portfolio-item">
+            <a href="#">
+                <img class="img-responsive" src="http://placehold.it/700x400" alt="">
+            </a>
+            <h3>
+                <a href="#">Project Two</a>
+            </h3>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam viverra euismod odio, gravida pellentesque urna varius vitae.</p>
+        </div>
+    <!-- /.row -->
 
-        <!-- Projects Row -->
-            <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 portfolio-item">
-                <a href="#">
-                    <img class="img-responsive" src="http://placehold.it/700x400" alt="">
-                </a>
-                <h3>
-                    <a href="#">Project Three</a>
-                </h3>
-                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam viverra euismod odio, gravida pellentesque urna varius vitae.</p>
-            </div>
-            <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 portfolio-item">
-                <a href="#">
-                    <img class="img-responsive" src="http://placehold.it/700x400" alt="">
-                </a>
-                <h3>
-                    <a href="#">Project Four</a>
-                </h3>
-                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam viverra euismod odio, gravida pellentesque urna varius vitae.</p>
-            </div>
-        <!-- /.row -->
+    <!-- Projects Row -->
+        <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 portfolio-item">
+            <a href="#">
+                <img class="img-responsive" src="http://placehold.it/700x400" alt="">
+            </a>
+            <h3>
+                <a href="#">Project Three</a>
+            </h3>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam viverra euismod odio, gravida pellentesque urna varius vitae.</p>
+        </div>
+        <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 portfolio-item">
+            <a href="#">
+                <img class="img-responsive" src="http://placehold.it/700x400" alt="">
+            </a>
+            <h3>
+                <a href="#">Project Four</a>
+            </h3>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam viverra euismod odio, gravida pellentesque urna varius vitae.</p>
+        </div>
+    <!-- /.row -->
 
-        <!-- Projects Row -->
-            <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 portfolio-item">
-                <a href="#">
-                    <img class="img-responsive" src="http://placehold.it/700x400" alt="">
-                </a>
-                <h3>
-                    <a href="#">Project Five</a>
-                </h3>
-                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam viverra euismod odio, gravida pellentesque urna varius vitae.</p>
-            </div>
-            <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 portfolio-item">
-                <a href="#">
-                    <img class="img-responsive" src="http://placehold.it/700x400" alt="">
-                </a>
-                <h3>
-                    <a href="#">Project Six</a>
-                </h3>
-                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam viverra euismod odio, gravida pellentesque urna varius vitae.</p>
-            </div>
+    <!-- Projects Row -->
+        <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 portfolio-item">
+            <a href="#">
+                <img class="img-responsive" src="http://placehold.it/700x400" alt="">
+            </a>
+            <h3>
+                <a href="#">Project Five</a>
+            </h3>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam viverra euismod odio, gravida pellentesque urna varius vitae.</p>
+        </div>
+        <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 portfolio-item">
+            <a href="#">
+                <img class="img-responsive" src="http://placehold.it/700x400" alt="">
+            </a>
+            <h3>
+                <a href="#">Project Six</a>
+            </h3>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam viverra euismod odio, gravida pellentesque urna varius vitae.</p>
+        </div>
         <!-- /.row -->
 
         <hr>
@@ -173,7 +180,7 @@
         <footer>
             <div class="row">
                 <div class="col-lg-12">
-                    <p>Copyright &copy; Your Website 2014</p>
+                    <p>Copyright &copy; ASW 2016</p>
                 </div>
             </div>
             <!-- /.row -->

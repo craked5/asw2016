@@ -1,10 +1,130 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Leilões Fantásticos</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="{{ url_for('static', filename='css/2-col-portfolio.css') }}" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap-formhelpers.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/login_register_style.css') }}">
+
+    <!-- jQuery -->
+    <script src="{{ url_for('static', filename='js/jquery.js') }}"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
 </head>
 <body>
+
+    <nav class="navbar" role="navigation">
+        <div class="container">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <a class="navbar-brand">Leilões Fantásticos</a>
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+                    {% if session_user_name %}
+                        <li>
+                            <a href={{ url_for('leiloes') }}>Leilões</a>
+                        </li>
+                        <li>
+                            <a href={{ url_for('leiloar') }}>Leiloar Novo Artigo</a>
+                        </li>
+                    {% else %}
+                        <li>
+                            <a href={{ url_for('leiloes') }}>Leilões</a>
+                        </li>
+                    {% endif %}
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    {% if session_user_name %}
+                        <li>
+                            <a href="{{ url_for('logout') }}"><span>Logout</span></a>
+                        </li>
+                        <li>
+                            <a href={{ url_for('perfil') }}>{{ session_user_name }}</a>
+                        </li>
+                    {% else %}
+                        <li><a href={{ url_for('login') }}>Login</a></li>
+                        <li>
+                            <a href={{ url_for('registo') }}>Registo</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>
+    <div class="top-content">
+        <div class="inner-bg">
+            <div class="container">
+
+                <div class="row">
+                    <div class="col-sm-8 col-sm-offset-2 text">
+                        <h1><strong>Bem Vindo {{ session_user_name }}</strong>
+                            <br>
+                        </h1>
+                    </div>
+                </div>
+
+                <div class="form-box">
+                    <div class="form-top">
+                        <div class="form-top-left">
+                            <h3>Preenche o formulario em baixo para fazeres um novo leilão!</h3>
+                        </div>
+                        <div class="form-top-right">
+                            <i class="fa fa-pencil"></i>
+                        </div>
+                    </div>
+                    <div class="form-bottom">
+                        {% if error %}
+                                <p class=error><strong>Error:</strong> {{ error }}
+                        {% endif %}
+                        {% if message %}
+                                <p class=message><strong>Message:</strong> {{ message }}
+                        {% endif %}
+                        <form role="form" action="" method="post" class="registration-form">
+                            <div class="form-group">
+                                <label class="sr-only" for="nome-artigo">Nome do artigo</label>
+                                <input type="text" name="nome-artigo" placeholder="Nome do artigo..." class="form-first-name form-control" id="nome-artigo">
+                            </div>
+                            <div class="form-group">
+                                <label class="sr-only" for="descricao-artigo">Descrição do artigo</label>
+                                <input type="text" name="descricao-artigo" placeholder="Descricao do artigo..." class="form-last-name form-control" id="descricao-artigo">
+                            </div>
+                            <div class="form-group">
+                                <label class="sr-only" for="valor-base">Valor Base</label>
+                                <input type="text" name="valor-base" placeholder="Valor base..." class="form-email form-control" id="valor-base">
+                            </div>
+                            <div class="form-group">
+                                <label class="sr-only" for="username">Tags do Artigo (Separadas por espaço)</label>
+                                <input type="text" name="tags" placeholder="Tags..." class="form-control" id="tags">
+                            </div>
+                            <div class="form-group">
+                                <label class="sr-only" for="data-inicio">Data de Inicio do Leilão YYYY-MM-DD</label>
+                                <input type="date" name="data-inicio" placeholder="Data de Nascimento YYYY-MM-DD" class="form form-control" id="data-inicio">
+                            </div>
+                            <div class="form-group">
+                                <label class="sr-only" for="data-fim">Data de Fim do Leilão YYYY-MM-DD</label>
+                                <input type="date" name="data-fim" placeholder="Data de Nascimento YYYY-MM-DD" class="form form-control" id="data-fim">
+                            </div>
+                            <button type="submit" class="btn btn-info">Fazer novo leilão!</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
 </body>
 </html>
