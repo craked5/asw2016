@@ -147,17 +147,17 @@ def admin_logged():
 
     return redirect(url_for('leiloes'))
 
-@app.route("/leilao/<leilao_id>", methods=["GET", "POST"])
-def leilao(leilao_id):
-
+@app.route("/leilao", methods=["GET", "POST"])
+def leilao():
     if request.method == "POST":
         pass
 
-
+    '''
     if db_utils_flask.is_user_auction(cur, session["username"], leilao_id):
         render_template(leilao.html, is_user_auction = True, session_user_name = session["username"])
     else:
-        render_template(leilao.html, session_user_name = session["username"])
+    '''
+    return render_template("auction.html", session_user_name = session["username"])
 
 @app.route("/leiloar", methods=["GET", "POST"])
 def leiloar():

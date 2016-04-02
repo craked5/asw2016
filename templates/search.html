@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Registo!</title>
+
+    <script src="{{ url_for('static', filename='js/jquery.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/bootstrap-formhelpers.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto:400,100,300,500">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/font-awesome.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/form-elements_lr.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/login_register_style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap-formhelpers.css') }}">
+
+    <!-- Favicon and touch icons -->
+
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="{{ url_for('static', filename='imagens/apple-touch-icon-144-precomposed.png') }}">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="{{ url_for('static', filename='images/apple-touch-icon-114-precomposed.png') }}">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="{{ url_for('static', filename='imagens/apple-touch-icon-72-precomposed.png') }}">
+    <link rel="apple-touch-icon-precomposed" href="{{ url_for('static', filename='imagens/apple-touch-icon-57-precomposed.png') }}">
+
+</head>
+<body>
+    <nav class="navbar" role="navigation">
+        <div class="container">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <a class="navbar-brand">Leilões Fantásticos</a>
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+                    {% if session_user_name %}
+                        <li>
+                            <a href={{ url_for('leiloes') }}>Leilões</a>
+                        </li>
+                        <li>
+                            <a href={{ url_for('leiloar') }}>Leiloar Novo Artigo</a>
+                        </li>
+                        <li>
+                            <a href={{ url_for('leiloes') }}>Procurar</a>
+                        </li>
+                    {% else %}
+                        <li>
+                            <a href={{ url_for('leiloes') }}>Leilões</a>
+                        </li>
+                        <li>
+                            <a href={{ url_for('leiloes') }}>Procurar</a>
+                        </li>
+                    {% endif %}
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    {% if session_user_name %}
+                        <li>
+                            <a href="{{ url_for('logout') }}"><span>Logout</span></a>
+                        </li>
+                        <li>
+                            <a href={{ url_for('perfil') }}>{{ session_user_name }}</a>
+                        </li>
+                    {% else %}
+                        <li><a href={{ url_for('login') }}>Login</a></li>
+                        <li>
+                            <a href={{ url_for('registo') }}>Registo</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>
+
+</body>
+</html>

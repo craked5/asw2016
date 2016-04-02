@@ -17,6 +17,10 @@ a, a:hover, a:focus {
     margin-bottom: 0;
 }
 
+.navbar-nav {
+    font-weight: normal;
+}
+
 .row {
     margin-top: -30px;
 }
