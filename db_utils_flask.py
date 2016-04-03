@@ -70,7 +70,7 @@ def is_user_auction(cur, nick, leilao_id):
     cur.execute("SELECT user_id FROM utilizadores WHERE nick = %s;", [nick])
     user_id = cur.fetchone()[0]
 
-    cur.execute("SELECT user_id FROM artigos WHERE leilao_id = %s;", [leilao_id])
+    cur.execute("SELECT user_id FROM artigos WHERE item_id = %s;", [leilao_id])
 
     if user_id == cur.fetchone()[0]:
         return True
@@ -82,11 +82,17 @@ def get_user_info(cur, nick):
     cur.execute("SELECT * FROM utilizadores WHERE nick = %s;", [nick])
     return cur.fetchone()
 
-def get_user_auctions(cur, nick):
-
+def get_user_auctions_number(cur, nick):
     user_id = get_user_id(cur,nick)
+    cur.execute("SELECT item_id FROM artigos WHERE user_id = %s;", [user_id])
+    return cur.fetchall()
 
-    cur.execute("SELECT * FROM artigos WHERE user_id = %s;", [user_id])
+def get_user_auction(cur, item_id):
+    cur.execute("SELECT * FROM artigos WHERE item_id = %s;", [item_id])
+    return cur.fetchall()
+
+def get_auction_tags(cur, item_id):
+    cur.execute("SELECT * FROM tags WHERE item_id = %s;", [item_id])
     return cur.fetchall()
 
 def get_max_tag_id(cur):
@@ -118,7 +124,7 @@ def make_new_auction(conn, cur, nick, nome_artigo, desc_artigo, base_value, tags
     for index, tag in enumerate(tags):
         tag_id += 1
         querie_new_tags = "INSERT INTO `tags` VALUES (%s, %s, %s, '%s');" \
-            % (tag_id, max_auction_id, user_id, tags[index])
+            % (tag_id, user_id, max_auction_id, tags[index])
         cur.execute(querie_new_tags)
 
     querie_new_auction = "INSERT INTO `artigos` VALUES (%s, '%s', %s, %s, '%s', '%s', '%s', %s, %s);" \
@@ -128,3 +134,11 @@ def make_new_auction(conn, cur, nick, nome_artigo, desc_artigo, base_value, tags
         return True
     else:
         return False
+
+def get_all_auctions(cur):
+    cur.execute("SELECT * FROM artigos")
+    return cur.fetchall()
+
+def get_user_nick_from_itemid(cur, user_id):
+    cur.execute("SELECT nick FROM utilizadores WHERE user_id = %s", [user_id])
+    return cur.fetchone()

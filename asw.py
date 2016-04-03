@@ -3,6 +3,7 @@ from flask.ext.mysql import MySQL
 from werkzeug.security import generate_password_hash, check_password_hash
 from bs4 import BeautifulSoup
 import db_utils_flask
+from collections import OrderedDict
 import time
 
 app = Flask(__name__)
@@ -37,9 +38,12 @@ def leiloes():
 
 
 
-
-        return render_template('auctions.html', session_user_name=username_session)
-    return render_template('auctions.html')
+        auctions = db_utils_flask.get_all_auctions(cur)
+        print auctions
+        for item in auctions:
+            print item
+        return render_template('auctions.html', session_user_name=username_session, auctions = auctions)
+    return render_template('auctions.html', auctions=auctions)
 
 @app.route('/login', methods=["GET", "POST"])
 def login():
@@ -147,17 +151,29 @@ def admin_logged():
 
     return redirect(url_for('leiloes'))
 
-@app.route("/leilao", methods=["GET", "POST"])
-def leilao():
-    if request.method == "POST":
-        pass
+@app.route("/leilao/<item_id>", methods=["GET", "POST"])
+def leilao(item_id):
 
-    '''
-    if db_utils_flask.is_user_auction(cur, session["username"], leilao_id):
-        render_template(leilao.html, is_user_auction = True, session_user_name = session["username"])
-    else:
-    '''
-    return render_template("auction.html", session_user_name = session["username"])
+    auction = db_utils_flask.get_user_auction(cur, item_id)
+    auction_owner = db_utils_flask.get_user_nick_from_itemid(cur, auction[0][2])
+    tags = db_utils_flask.get_auction_tags(cur, item_id)
+
+    print auction
+    print tags
+
+    if request.method == "POST":
+
+
+        '''
+        UPDATE `asw44285`.`artigos` SET `melhor_lic`='craked5', `melhor_val`='142' WHERE `item_id`='1';
+        '''
+
+    if db_utils_flask.is_user_auction(cur, session["username"], item_id):
+        return render_template("auction.html", is_user_auction = True, session_user_name = session["username"],
+                               tags=tags, auction_info = auction, auction_owner=auction_owner)
+
+    return render_template("auction.html", session_user_name = session["username"], is_user_auction = False,
+                           tags=tags, auction_info=auction, auction_owner=auction_owner)
 
 @app.route("/leiloar", methods=["GET", "POST"])
 def leiloar():
@@ -187,11 +203,31 @@ def perfil():
         if request.method == "POST":
             pass
 
+        auctions_dict = {}
+        tags_dict = {}
         user_info = db_utils_flask.get_user_info(cur, session["username"])
-        print user_info
-        #TODO what info do i want to show here? return templates with that info
-        return render_template("profile.html", session_user_name=session["username"], user_info=user_info)
 
+        user_number_auctions = db_utils_flask.get_user_auctions_number(cur, session["username"])
+
+        for auction_number in user_number_auctions:
+            print auction_number[0]
+            auctions_dict[str(auction_number[0])] = db_utils_flask.get_user_auction(cur, auction_number[0])
+            tags_dict[str(auction_number[0])] = db_utils_flask.get_auction_tags(cur, auction_number[0])
+        print auctions_dict
+        print tags_dict
+
+        return render_template("profile.html", session_user_name=session["username"], user_info=user_info,
+                               auctions_info=auctions_dict, tags_info=tags_dict)
+
+@app.route("/procurar", methods=["GET", "POST"])
+def procurar():
+    if "username" in session:
+        if request.method == "POST":
+            pass
+
+        return render_template("search.html", session_user_name = session["username"])
+
+    return render_template("search.html")
 
 if __name__ == '__main__':
     app.run(debug=True)
