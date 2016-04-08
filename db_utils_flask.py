@@ -155,3 +155,25 @@ def update_bid_amount(conn, cur, bidder, item_id, bid):
         return True
     else:
         return False
+
+def update_auction(conn, cur, nick, auction_id, nome_artigo, desc_artigo, base_value, tags, initial_date, end_date):
+
+    user_id = get_user_id(cur, nick)
+
+    tags = tags.split(" ")
+    tag_id = get_max_tag_id(cur)
+
+    for index, tag in enumerate(tags):
+        tag_id += 1
+        querie_new_tags = "INSERT INTO `tags` VALUES (%s, %s, %s, '%s');" \
+                          % (tag_id, user_id, auction_id, tags[index])
+        cur.execute(querie_new_tags)
+
+    querie_new_auction = "UPDATE `artigos` SET (%s, '%s', %s, %s, '%s', '%s', '%s', %s, %s);" \
+                         % (auction_id, nome_artigo, user_id, base_value, desc_artigo, initial_date, end_date,
+                            "NULL", "NULL")
+    if cur.execute(querie_new_auction) == 1:
+        conn.commit()
+        return True
+    else:
+        return False

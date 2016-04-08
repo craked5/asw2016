@@ -149,8 +149,14 @@
             </h3>
             </div>
             <div class="col-md-6">
-                <a href="{{ url_for("leilao", item_id = auctions_info[item][0][0]) }}"
-                   type="button" class="btn btn-info text-center">Alterar Info!</a>
+                {% if datetime >= auctions_info[item][0][5] %}
+                    <div class="alert alert-danger" role="alert">
+                        Nao e possivel editar o leilao porque este ja comecou!
+                    </div>
+                {% else %}
+                    <a href="{{ url_for("editar_leilao", item_id = auctions_info[item][0][0]) }}"
+                       type="button" class="btn btn-info text-center">Alterar Info!</a>
+                {% endif %}
             </div>
             <div class="col-md-6">
                 <p>Data de Inicio: {{ auctions_info[item][0][5] }}</p>

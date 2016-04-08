@@ -24,7 +24,7 @@ mysql = MySQL()
 # MySQL configurations
 app.config['MYSQL_DATABASE_USER'] = 'root'
 app.config['MYSQL_DATABASE_PASSWORD'] = 'halflife2'
-app.config['MYSQL_DATABASE_DB'] = 'asw44285'
+app.config['MYSQL_DATABASE_DB'] = 'asw'
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 mysql.init_app(app)
 
@@ -155,8 +155,13 @@ def leilao(item_id):
     tags = db_utils_flask.get_auction_tags(cur, item_id)
     last_bidder = db_utils_flask.get_user_nick_from_userid(cur, auction[0][7])
 
-    if last_bidder[0] == None:
-        last_bidder[0] = "Nenhum"
+    print last_bidder
+
+    print last_bidder == None
+
+    if last_bidder is None:
+        last_bidder = []
+        last_bidder.append("Nenhum")
 
     if request.method == "POST":
 
@@ -164,14 +169,28 @@ def leilao(item_id):
             return render_template("auction.html", session_user_name=session["username"], is_user_auction=False,
                                    tags=tags, auction_info=auction, auction_owner=auction_owner,
                                    message="Este leilao ja acabou!", last_bidder = last_bidder[0])
+        elif datetime.datetime.today() < auction[0][5]:
+            return render_template("auction.html", session_user_name=session["username"], is_user_auction=False,
+                                   tags=tags, auction_info=auction, auction_owner=auction_owner,
+                                   message="Este leilao ainda nao comecou!", last_bidder=last_bidder[0])
 
         bid_amount = request.form["bid_amount"]
+        if auction[0][8] is not None:
+            if float(bid_amount) <= float(auction[0][8]):
+                return render_template("auction.html", is_user_auction=True, session_user_name=session["username"],
+                                       tags=tags, auction_info=auction, auction_owner=auction_owner,
+                                       message="O valor da sua bid foi menor que o ultimo bid existente!", last_bidder=last_bidder[0])
+            elif float(bid_amount) <= float(auction[0][3]):
+                return render_template("auction.html", is_user_auction=True, session_user_name=session["username"],
+                                       tags=tags, auction_info=auction, auction_owner=auction_owner,
+                                       message="O valor da sua bid foi menor que o valor base!",
+                                       last_bidder=last_bidder[0])
+
         if db_utils_flask.update_bid_amount(conn, cur, session["username"], auction[0][0], bid_amount):
             return render_template("auction.html", is_user_auction=True, session_user_name=session["username"],
                                    tags=tags, auction_info=auction, auction_owner=auction_owner,
-                                   message="A sua bid foi aceite!", last_bidder = session["username"])
+                                   message="A sua bid foi aceite!", last_bidder = session["username"], new_bid = bid_amount)
         else:
-
             return render_template("auction.html", is_user_auction=True, session_user_name=session["username"],
                                    tags=tags, auction_info=auction, auction_owner=auction_owner,
                                    message="Ocurreu um error a fazer a sua bid", last_bidder = last_bidder[0])
@@ -225,7 +244,56 @@ def perfil():
         print tags_dict
 
         return render_template("profile.html", session_user_name=session["username"], user_info=user_info,
-                               auctions_info=auctions_dict, tags_info=tags_dict)
+                               auctions_info=auctions_dict, tags_info=tags_dict , datetime = datetime.datetime.today())
+
+@app.route("/editar_leilao/<item_id>", methods=["GET", "POST"])
+def editar_leilao(item_id):
+    if "username" in session:
+
+        auction = db_utils_flask.get_user_auction(cur, item_id)
+        auction_owner = db_utils_flask.get_user_nick_from_userid(cur, auction[0][2])
+        tags = db_utils_flask.get_auction_tags(cur, item_id)
+        last_bidder = db_utils_flask.get_user_nick_from_userid(cur, auction[0][7])
+
+        print last_bidder
+
+        print last_bidder == None
+
+        if last_bidder is None:
+            last_bidder = []
+            last_bidder.append("Nenhum")
+
+        info = {}
+        if request.method == 'POST':
+            info["nome_artigo"] = request.form['nome-artigo']
+            info["descricao_artigo"] = request.form['descricao-artigo']
+            info["valor_base"] = request.form['valor-base']
+            info["tags"] = request.form['tags']
+            info["data_inicio"] = request.form['data-inicio']
+            info["data_fim"] = request.form['data-fim']
+
+            if auction[0][5] >= datetime.datetime.today():
+                return render_template("auction.html", message="Nao e possivel editar este leilao porque ja comecou!",
+                                       session_user_name=session["username"],
+                                       auction_info=auction, tags=tags, last_bidder="Nenhum",
+                                       auction_owner=auction_owner)
+
+            if db_utils_flask.update_auction(conn, cur, session["username"], auction[0][0], info["nome_artigo"],
+                                               info["descricao_artigo"],
+                                               info["valor_base"], info["tags"], info["data_inicio"],
+                                               info["data_fim"]):
+
+                auction = db_utils_flask.get_user_auction(cur, item_id)
+                auction_owner = db_utils_flask.get_user_nick_from_userid(cur, auction[0][2])
+                tags = db_utils_flask.get_auction_tags(cur, item_id)
+                return render_template("auction.html", message="Leilao editado com sucesso!",
+                                       session_user_name=session["username"],
+                                       auction_info=auction, tags=tags, last_bidder="Nenhum", auction_owner=auction_owner)
+
+        return render_template("edit_auction.html", session_user_name=session["username"],
+                               auction = auction, auction_owner= auction_owner, tags=tags)
+
+    return render_template("auctions.html", error="Por favor faca Login para editar um leilao!")
 
 @app.route("/procurar", methods=["GET", "POST"])
 def procurar():
