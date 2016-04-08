@@ -155,6 +155,9 @@ def leilao(item_id):
     tags = db_utils_flask.get_auction_tags(cur, item_id)
     last_bidder = db_utils_flask.get_user_nick_from_userid(cur, auction[0][7])
 
+    if last_bidder[0] == None:
+        last_bidder[0] = "Nenhum"
+
     if request.method == "POST":
 
         if datetime.datetime.today() > auction[0][6]:
@@ -168,6 +171,7 @@ def leilao(item_id):
                                    tags=tags, auction_info=auction, auction_owner=auction_owner,
                                    message="A sua bid foi aceite!", last_bidder = session["username"])
         else:
+
             return render_template("auction.html", is_user_auction=True, session_user_name=session["username"],
                                    tags=tags, auction_info=auction, auction_owner=auction_owner,
                                    message="Ocurreu um error a fazer a sua bid", last_bidder = last_bidder[0])
@@ -175,12 +179,9 @@ def leilao(item_id):
     if db_utils_flask.is_user_auction(cur, session["username"], item_id):
         return render_template("auction.html", is_user_auction = True, session_user_name = session["username"],
                                tags=tags, auction_info = auction, auction_owner=auction_owner, last_bidder = last_bidder[0])
-    if last_bidder[0] != None:
-        return render_template("auction.html", session_user_name = session["username"], is_user_auction = False,
-                               tags=tags, auction_info=auction, auction_owner=auction_owner, last_bidder = last_bidder[0])
-    else:
-        return render_template("auction.html", session_user_name=session["username"], is_user_auction=False,
-                               tags=tags, auction_info=auction, auction_owner=auction_owner, last_bidder= "Nenhum")
+
+    return render_template("auction.html", session_user_name = session["username"], is_user_auction = False,
+                           tags=tags, auction_info=auction, auction_owner=auction_owner, last_bidder = last_bidder[0])
 
 @app.route("/leiloar", methods=["GET", "POST"])
 def leiloar():
