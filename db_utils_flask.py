@@ -171,9 +171,9 @@ def update_auction(conn, cur, nick, auction_id, nome_artigo, desc_artigo, base_v
 
     querie_new_auction = "UPDATE `artigos` SET `item_id` = %s, `designacao` = '%s', `user_id`= %s," \
                          " `valor_base`=%s, `descricao`='%s', `data_entr`='%s', `data_fim`= '%s', " \
-                         "`melhor_lic`= %s, `melhor_val`= %s);" \
+                         "`melhor_lic`= %s, `melhor_val`= %s) where item_id = %s;" \
                          % (auction_id, nome_artigo, user_id, base_value, desc_artigo, initial_date, end_date,
-                            "NULL", "NULL")
+                            "NULL", "NULL", auction_id)
     if cur.execute(querie_new_auction) == 1:
         conn.commit()
         return True
