@@ -185,6 +185,12 @@ def leilao(item_id):
                                        message="O valor da sua bid foi menor que o valor base!",
                                        last_bidder=last_bidder[0])
 
+            if auction_owner == session["username"]:
+                return render_template("auction.html", is_user_auction=True, session_user_name=session["username"],
+                                       tags=tags, auction_info=auction, auction_owner=auction_owner,
+                                       message="Nao pode fazer bids nos seus leiloes!",
+                                       last_bidder=last_bidder[0])
+
             if db_utils_flask.update_bid_amount(conn, cur, session["username"], auction[0][0], bid_amount):
                 return render_template("auction.html", is_user_auction=True, session_user_name=session["username"],
                                        tags=tags, auction_info=auction, auction_owner=auction_owner,
