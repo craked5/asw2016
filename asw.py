@@ -155,10 +155,6 @@ def leilao(item_id):
     tags = db_utils_flask.get_auction_tags(cur, item_id)
     last_bidder = db_utils_flask.get_user_nick_from_userid(cur, auction[0][7])
 
-    print last_bidder
-
-    print last_bidder == None
-
     if last_bidder is None:
         last_bidder = []
         last_bidder.append("Nenhum")
@@ -176,6 +172,9 @@ def leilao(item_id):
 
         bid_amount = request.form["bid_amount"]
         if auction[0][8] is not None:
+            print float(bid_amount) <= float(auction[0][8])
+            print float(bid_amount)
+            print float(auction[0][8])
             if float(bid_amount) <= float(auction[0][8]):
                 return render_template("auction.html", is_user_auction=True, session_user_name=session["username"],
                                        tags=tags, auction_info=auction, auction_owner=auction_owner,
@@ -186,14 +185,14 @@ def leilao(item_id):
                                        message="O valor da sua bid foi menor que o valor base!",
                                        last_bidder=last_bidder[0])
 
-        if db_utils_flask.update_bid_amount(conn, cur, session["username"], auction[0][0], bid_amount):
-            return render_template("auction.html", is_user_auction=True, session_user_name=session["username"],
-                                   tags=tags, auction_info=auction, auction_owner=auction_owner,
-                                   message="A sua bid foi aceite!", last_bidder = session["username"], new_bid = bid_amount)
-        else:
-            return render_template("auction.html", is_user_auction=True, session_user_name=session["username"],
-                                   tags=tags, auction_info=auction, auction_owner=auction_owner,
-                                   message="Ocurreu um error a fazer a sua bid", last_bidder = last_bidder[0])
+            if db_utils_flask.update_bid_amount(conn, cur, session["username"], auction[0][0], bid_amount):
+                return render_template("auction.html", is_user_auction=True, session_user_name=session["username"],
+                                       tags=tags, auction_info=auction, auction_owner=auction_owner,
+                                       message="A sua bid foi aceite!", last_bidder = session["username"], new_bid = bid_amount)
+            else:
+                return render_template("auction.html", is_user_auction=True, session_user_name=session["username"],
+                                       tags=tags, auction_info=auction, auction_owner=auction_owner,
+                                       message="Ocurreu um error a fazer a sua bid", last_bidder = last_bidder[0])
 
     if db_utils_flask.is_user_auction(cur, session["username"], item_id):
         return render_template("auction.html", is_user_auction = True, session_user_name = session["username"],
