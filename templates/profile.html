@@ -171,11 +171,7 @@
                 <p>Data de Fim: {{ auctions_info[item][0][6] }}</p>
             </div>
             <div class="col-md-6">
-                {% if auctions_info[item][0][8] != int %}
-                    <p>Ultimo Bid - Nenhum</p>
-                {% else %}
                     <p>Ultimo Bid - {{ auctions_info[item][0][8] }}</p>
-                {% endif %}
             </div>
         </div>
     {% endfor %}
