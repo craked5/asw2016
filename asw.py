@@ -86,7 +86,7 @@ def registo():
         if db_utils_flask.register(conn, cur, info["username"], info["email"], info["password"], info["first_name"],
                                 info["last_name"], info["gender"], info["country"],
                                 info["birth_date"], info["conselho"], info["district"]) == True:
-            return render_template("register.html", message="Regist was done good, please login!")
+            return render_template("auctions.html", message="Regist was done good, please login!")
 
     return render_template('register.html', error=error)
 
