@@ -157,6 +157,8 @@
                     <a href="{{ url_for("editar_leilao", item_id = auctions_info[item][0][0]) }}"
                        type="button" class="btn btn-info text-center">Alterar Info!</a>
                 {% endif %}
+                <a href="{{ url_for("leilao", item_id = auctions_info[item][0][0]) }}"
+                           type="button" class="btn btn-info text-center">Ver Leilao!</a>
             </div>
             <div class="col-md-6">
                 <p>Data de Inicio: {{ auctions_info[item][0][5] }}</p>
