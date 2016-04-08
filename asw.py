@@ -5,6 +5,8 @@ from bs4 import BeautifulSoup
 import db_utils_flask
 from collections import OrderedDict
 import time
+import datetime
+
 
 app = Flask(__name__)
 app.config['DEBUG'] = True
@@ -31,17 +33,11 @@ cur = conn.cursor()
 
 @app.route('/')
 def leiloes():
+    auctions = db_utils_flask.get_all_auctions(cur)
+
     if 'username' in session:
         username_session = escape(session['username']).capitalize()
 
-
-
-
-
-        auctions = db_utils_flask.get_all_auctions(cur)
-        print auctions
-        for item in auctions:
-            print item
         return render_template('auctions.html', session_user_name=username_session, auctions = auctions)
     return render_template('auctions.html', auctions=auctions)
 
@@ -155,25 +151,33 @@ def admin_logged():
 def leilao(item_id):
 
     auction = db_utils_flask.get_user_auction(cur, item_id)
-    auction_owner = db_utils_flask.get_user_nick_from_itemid(cur, auction[0][2])
+    auction_owner = db_utils_flask.get_user_nick_from_userid(cur, auction[0][2])
     tags = db_utils_flask.get_auction_tags(cur, item_id)
-
-    print auction
-    print tags
+    last_bidder = db_utils_flask.get_user_nick_from_userid(cur, auction[0][7])
 
     if request.method == "POST":
 
+        if datetime.datetime.today() > auction[0][6]:
+            return render_template("auction.html", session_user_name=session["username"], is_user_auction=False,
+                                   tags=tags, auction_info=auction, auction_owner=auction_owner,
+                                   message="Este leilao ja acabou!", last_bidder = last_bidder[0])
 
-        '''
-        UPDATE `asw44285`.`artigos` SET `melhor_lic`='craked5', `melhor_val`='142' WHERE `item_id`='1';
-        '''
+        bid_amount = request.form["bid_amount"]
+        if db_utils_flask.update_bid_amount(conn, cur, session["username"], auction[0][0], bid_amount):
+            return render_template("auction.html", is_user_auction=True, session_user_name=session["username"],
+                                   tags=tags, auction_info=auction, auction_owner=auction_owner,
+                                   message="A sua bid foi aceite!", last_bidder = session["username"])
+        else:
+            return render_template("auction.html", is_user_auction=True, session_user_name=session["username"],
+                                   tags=tags, auction_info=auction, auction_owner=auction_owner,
+                                   message="Ocurreu um error a fazer a sua bid", last_bidder = last_bidder[0])
 
     if db_utils_flask.is_user_auction(cur, session["username"], item_id):
         return render_template("auction.html", is_user_auction = True, session_user_name = session["username"],
-                               tags=tags, auction_info = auction, auction_owner=auction_owner)
+                               tags=tags, auction_info = auction, auction_owner=auction_owner, last_bidder = last_bidder[0])
 
     return render_template("auction.html", session_user_name = session["username"], is_user_auction = False,
-                           tags=tags, auction_info=auction, auction_owner=auction_owner)
+                           tags=tags, auction_info=auction, auction_owner=auction_owner, last_bidder = last_bidder[0])
 
 @app.route("/leiloar", methods=["GET", "POST"])
 def leiloar():

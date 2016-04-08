@@ -139,6 +139,19 @@ def get_all_auctions(cur):
     cur.execute("SELECT * FROM artigos")
     return cur.fetchall()
 
-def get_user_nick_from_itemid(cur, user_id):
+def get_user_nick_from_userid(cur, user_id):
     cur.execute("SELECT nick FROM utilizadores WHERE user_id = %s", [user_id])
     return cur.fetchone()
+
+def update_bid_amount(conn, cur, bidder, item_id, bid):
+
+    user_id = get_user_id(cur, bidder)
+
+    update_bid_querie = "UPDATE `artigos` SET `melhor_lic`=%s, `melhor_val`= %s WHERE" \
+                        " `item_id`= %s;" % (user_id, bid, item_id)
+
+    if cur.execute(update_bid_querie) == 1:
+        conn.commit()
+        return True
+    else:
+        return False
