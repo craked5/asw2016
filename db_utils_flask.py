@@ -169,7 +169,9 @@ def update_auction(conn, cur, nick, auction_id, nome_artigo, desc_artigo, base_v
                           % (tag_id, user_id, auction_id, tags[index])
         cur.execute(querie_new_tags)
 
-    querie_new_auction = "UPDATE `artigos` SET (%s, '%s', %s, %s, '%s', '%s', '%s', %s, %s);" \
+    querie_new_auction = "UPDATE `artigos` SET `item_id` = %s, `designacao` = '%s', `user_id`= %s," \
+                         " `valor_base`=%s, `descricao`='%s', `data_entr`='%s', `data_fim`= '%s', " \
+                         "`melhor_lic`= %s, `melhor_val`= %s);" \
                          % (auction_id, nome_artigo, user_id, base_value, desc_artigo, initial_date, end_date,
                             "NULL", "NULL")
     if cur.execute(querie_new_auction) == 1:
