@@ -274,8 +274,14 @@ def editar_leilao(item_id):
             info["descricao_artigo"] = request.form['descricao-artigo']
             info["valor_base"] = request.form['valor-base']
             info["tags"] = request.form['tags']
-            info["data_inicio"] = request.form['data-inicio']
-            info["data_fim"] = request.form['data-fim']
+            if request.form['data-inicio'] != None:
+                info["data_inicio"] = request.form['data-inicio']
+            else:
+                info["data_inicio"] = auction[0][5]
+            if request.form['data-fim'] != None:
+                info["data_fim"] = request.form['data-fim']
+            else:
+                info["data_fim"] = auction[0][6]
 
             if datetime.datetime.today() >= auction[0][5]:
                 return render_template("auction.html", message="Nao e possivel editar este leilao porque ja comecou!",
