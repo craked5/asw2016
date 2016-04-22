@@ -228,7 +228,7 @@ def leilao(item_id):
 
     if db_utils_flask.is_user_auction(cur, session["username"], item_id):
         res = make_response(render_template("auction.html", is_user_auction = True, session_user_name = session["username"],
-                               tags=tags, auction_info = auction, message=auction_owner, last_bidder = last_bidder[0]))
+                               tags=tags, auction_info = auction, auction_owner=auction_owner, last_bidder = last_bidder[0]))
         res.headers.set('Cache-Control', 'public, max-age=0')
         return res
 
