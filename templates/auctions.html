@@ -88,11 +88,11 @@
         <!-- Projects Row -->
         {% for item in auctions %}
             <div class="col-xs-6 col-sm-4 portfolio-item">
-                <a href="#">
+                <a href="{{ url_for("leilao", item_id = item[0]) }}">
                     <img class="img-responsive" src="http://www.verdisreviews.com/wp-content/uploads/2015/08/usat-2012-auction.jpg" alt="" title="" style="">
                 </a>
                 <h3>
-                    <a href="#">{{ item[1] }}</a>
+                    <a href="{{ url_for("leilao", item_id = item[0]) }}">{{ item[1] }}</a>
                 </h3>
                 <div class="col-md-6">
                     <p>Data de Inicio: {{ item[5] }}</p>
@@ -104,10 +104,10 @@
                     <p>Valor Base - {{ item[3] }}</p>
                 </div>
                 <div class="col-md-6">
-                    {% if item[8] != int %}
-                        <p>Ultimo Bid - Nenhum</p>
-                    {% else %}
+                    {% if item[8]%}
                         <p>Ultimo Bid - {{ item[8] }}</p>
+                    {% else %}
+                        <p>Ultimo Bid - Nenhum</p>
                     {% endif %}
                 </div>
                 <a href="{{ url_for("leilao", item_id = item[0]) }}" class="btn btn-info text-center">Bid Now!</a>

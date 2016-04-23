@@ -34,6 +34,8 @@ cur = conn.cursor()
 @app.route('/')
 def leiloes():
     auctions = db_utils_flask.get_all_auctions(cur)
+    print auctions
+    print type(auctions[1][8])
     print len(auctions)
 
     if 'username' in session:
@@ -167,76 +169,85 @@ def leilao(item_id):
     tags = db_utils_flask.get_auction_tags(cur, item_id)
     last_bidder = db_utils_flask.get_user_nick_from_userid(cur, auction[0][7])
 
+    print auction_owner[0]
+    print session["username"]
+
     if last_bidder is None:
         last_bidder = []
         last_bidder.append("Nenhum")
 
     if request.method == "POST":
 
+        print 1
+
         if datetime.datetime.today() > auction[0][6]:
             res = make_response(render_template("auction.html", session_user_name=session["username"], is_user_auction=False,
                                    tags=tags, auction_info=auction, auction_owner=auction_owner,
                                    message="Este leilao ja acabou!", last_bidder = last_bidder[0]))
             res.headers.set('Cache-Control', 'public, max-age=0')
+            print 2
             return res
         elif datetime.datetime.today() < auction[0][5]:
             res =  make_response(render_template("auction.html", session_user_name=session["username"], is_user_auction=False,
                                    tags=tags, auction_info=auction, auction_owner=auction_owner,
                                    message="Este leilao ainda nao comecou!", last_bidder=last_bidder[0]))
             res.headers.set('Cache-Control', 'public, max-age=0')
+            print 3
             return res
 
         bid_amount = request.form["bid_amount"]
+
         if auction[0][8] is not None:
+            print 9
             print float(bid_amount) <= float(auction[0][8])
             print float(bid_amount)
             print float(auction[0][8])
             if float(bid_amount) <= float(auction[0][8]):
+                print 10
                 res = make_response(render_template("auction.html", is_user_auction=True, session_user_name=session["username"],
                                        tags=tags, auction_info=auction, auction_owner=auction_owner,
                                        message="O valor da sua bid foi menor que o ultimo bid existente!", last_bidder=last_bidder[0]))
                 res.headers.set('Cache-Control', 'public, max-age=0')
                 return res
-            elif float(bid_amount) <= float(auction[0][3]):
-                res = make_response(render_template("auction.html", is_user_auction=True, session_user_name=session["username"],
-                                       tags=tags, auction_info=auction, auction_owner=auction_owner,
-                                       message="O valor da sua bid foi menor que o valor base!",
-                                       last_bidder=last_bidder[0]))
-                res.headers.set('Cache-Control', 'public, max-age=0')
-                return res
 
-            if auction_owner == session["username"]:
-                res = make_response(render_template("auction.html", is_user_auction=True, session_user_name=session["username"],
-                                       tags=tags, auction_info=auction, auction_owner=auction_owner,
-                                       message="Nao pode fazer bids nos seus leiloes!",
-                                       last_bidder=last_bidder[0]))
-                res.headers.set('Cache-Control', 'public, max-age=0')
-                return res
+        if float(bid_amount) <= float(auction[0][3]):
+            res = make_response(render_template("auction.html", is_user_auction=True, session_user_name=session["username"],
+                                   tags=tags, auction_info=auction, auction_owner=auction_owner,
+                                   message="O valor da sua bid foi menor que o valor base!",
+                                   last_bidder=last_bidder[0]))
+            res.headers.set('Cache-Control', 'public, max-age=0')
+            print 5
+            return res
 
-            if db_utils_flask.update_bid_amount(conn, cur, session["username"], auction[0][0], bid_amount):
-                res = make_response(render_template("auction.html", is_user_auction=True, session_user_name=session["username"],
-                                       tags=tags, auction_info=auction, auction_owner=auction_owner,
-                                       message="A sua bid foi aceite!", last_bidder = session["username"], new_bid = bid_amount))
-                res.headers.set('Cache-Control', 'public, max-age=0')
-                return res
-            else:
-                res = make_response(render_template("auction.html", is_user_auction=True, session_user_name=session["username"],
-                                       tags=tags, auction_info=auction, auction_owner=auction_owner,
-                                       message="Ocurreu um error a fazer a sua bid", last_bidder = last_bidder[0]))
-                res.headers.set('Cache-Control', 'public, max-age=0')
-                return res
+        if auction_owner[0] == session["username"]:
+            res = make_response(render_template("auction.html", is_user_auction=True, session_user_name=session["username"],
+                                   tags=tags, auction_info=auction, auction_owner=auction_owner,
+                                   message="Nao pode fazer bids nos seus leiloes!",
+                                   last_bidder=last_bidder[0]))
+            res.headers.set('Cache-Control', 'public, max-age=0')
+            print 6
+            return res
 
-    if db_utils_flask.is_user_auction(cur, session["username"], item_id):
-        res = make_response(render_template("auction.html", is_user_auction = True, session_user_name = session["username"],
-                               tags=tags, auction_info = auction, auction_owner=auction_owner, last_bidder = last_bidder[0]))
-        res.headers.set('Cache-Control', 'public, max-age=0')
-        return res
+        if db_utils_flask.update_bid_amount(conn, cur, session["username"], auction[0][0], bid_amount):
+            res = make_response(render_template("auction.html", is_user_auction=True, session_user_name=session["username"],
+                                   tags=tags, auction_info=auction, auction_owner=auction_owner,
+                                   message="A sua bid foi aceite!", last_bidder = session["username"], new_bid = bid_amount))
+            res.headers.set('Cache-Control', 'public, max-age=0')
+            print 7
+            return res
+        else:
+            res = make_response(render_template("auction.html", is_user_auction=True, session_user_name=session["username"],
+                                   tags=tags, auction_info=auction, auction_owner=auction_owner,
+                                   message="Ocurreu um error a fazer a sua bid", last_bidder = last_bidder[0]))
+            res.headers.set('Cache-Control', 'public, max-age=0')
+            print 8
+            return res
 
-    res = make_response(render_template("auction.html", session_user_name = session["username"], is_user_auction = False,
-                           tags=tags, auction_info=auction, auction_owner=auction_owner, last_bidder = last_bidder[0]))
+    res = make_response(
+        render_template("auction.html", session_user_name=session["username"], is_user_auction=False,
+                        tags=tags, auction_info=auction, auction_owner=auction_owner, last_bidder=last_bidder[0]))
     res.headers.set('Cache-Control', 'public, max-age=0')
     return res
-
 
 @app.route("/leiloar", methods=["GET", "POST"])
 def leiloar():

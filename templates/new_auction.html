@@ -98,28 +98,34 @@
                         {% endif %}
                         <form role="form" action="" method="post" class="registration-form">
                             <div class="form-group">
+                                <label>Nome do artigo</label>
                                 <label class="sr-only" for="nome-artigo">Nome do artigo</label>
                                 <input type="text" name="nome-artigo" placeholder="Nome do artigo..." class="form-first-name form-control" id="nome-artigo">
                             </div>
                             <div class="form-group">
+                                <label>Descrição do artigo</label>
                                 <label class="sr-only" for="descricao-artigo">Descrição do artigo</label>
                                 <input type="text" name="descricao-artigo" placeholder="Descricao do artigo..." class="form-last-name form-control" id="descricao-artigo">
                             </div>
                             <div class="form-group">
+                                <label>Valor Base</label>
                                 <label class="sr-only" for="valor-base">Valor Base</label>
                                 <input type="text" name="valor-base" placeholder="Valor base..." class="form-email form-control" id="valor-base">
                             </div>
                             <div class="form-group">
-                                <label class="sr-only" for="username">Tags do Artigo (Separadas por espaço)</label>
+                                <label>Tags do Artigo (Separadas por virgula)</label>
+                                <label class="sr-only" for="username">Tags do Artigo (Separadas por virgula)</label>
                                 <input type="text" name="tags" placeholder="Tags..." class="form-control" id="tags">
                             </div>
                             <div class="form-group">
+                                <label>Data de Inicio do Leilão</label>
                                 <label class="sr-only" for="data-inicio">Data de Inicio do Leilão YYYY-MM-DD</label>
-                                <input type="date" name="data-inicio" placeholder="Data de Nascimento YYYY-MM-DD" class="form form-control" id="data-inicio">
+                                <input type="date" name="data-inicio" placeholder="Data de Nascimento..." class="form form-control" id="data-inicio">
                             </div>
                             <div class="form-group">
+                                <label>Data de Fim do Leilão</label>
                                 <label class="sr-only" for="data-fim">Data de Fim do Leilão YYYY-MM-DD</label>
-                                <input type="date" name="data-fim" placeholder="Data de Nascimento YYYY-MM-DD" class="form form-control" id="data-fim">
+                                <input type="date" name="data-fim" placeholder="Data de Nascimento..." class="form form-control" id="data-fim">
                             </div>
                             <button type="submit" class="btn btn-info">Fazer novo leilão!</button>
                         </form>
