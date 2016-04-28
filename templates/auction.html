@@ -21,6 +21,11 @@
 
     <!-- Bootstrap Core JavaScript -->
     <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+    <script>
+        $(document).ready(function(){
+            $('[data-toggle="popover"]').popover();
+        });
+    </script>
 </head>
 
 <body>
@@ -74,22 +79,25 @@
     <h3 style="text-align: center">
             <a href="#">{{ auction_info[0][1] }}</a>
     </h3>
-    <h4 style="text-align: center"> {{ message }}</h4>
     <h4 style="text-align: center" >Descricao - {{ auction_info[0][4] }}</h4>
-    <div class="container-fluid">
+    <br>
+    {% if message %}
+        <div class="alert alert-danger" style="text-align: center"> {{ message }}</div>
+    {% endif %}
+
+    <div class="col-xs-6 portfolio-item">
         <img class="img-responsive" src="http://www.verdisreviews.com/wp-content/uploads/2015/08/usat-2012-auction.jpg" alt="" title="" style="text-align: center;
         margin: 0 auto; padding-bottom: 5%;">
     </div>
-
     <div class="col-xs-6 portfolio-item">
         <div class="col-md-6">
             <p>Data de Inicio: {{ auction_info[0][5] }}</p>
         </div>
         <div class="col-md-6">
-            <p>Valor Base - {{ auction_info[0][3] }}</p>
+            <p>Data de Fim: {{ auction_info[0][6] }}</p>
         </div>
         <div class="col-md-6">
-            <p>Data de Fim: {{ auction_info[0][6] }}</p>
+            <p>Valor Base - {{ auction_info[0][3] }}</p>
         </div>
         <div class="col-md-6">
             {% if new_bid %}
@@ -98,6 +106,31 @@
                 <p>Ultimo Bid -  {{ auction_info[0][8] }}</p>
             {% endif %}
         </div>
+
+        <div class="col-md-6">
+            <p>Ultimo Bidder -  {{ last_bidder }}</p>
+        </div>
+        <div class="col-md-6">
+            <p>Dono do leilao:  {{ auction_owner[0] }}</p>
+        </div>
+
+            <p>TAGS -
+                {% for tag in tags %}
+                    {{ tag[3] }}
+                {% endfor %}
+            </p>
+            <button type="button" class="btn btn-default" data-container="body" data-toggle="popover" data-placement="bottom" data-content="Vivamus
+                sagittis lacus vel augue laoreet rutrum faucibus.">
+                Popover on bottom
+            </button>
+
+
+        <div class="col-md-6">
+            <a style="text-align: center;
+            margin: 0 auto;" href=""  class="btn btn-info text-center">Enviar Mensagem!</a>
+        </div>
+    </div>
+    <div class="col-xs-6 portfolio-item">
         <div class="col-md-6">
             <form role="form" action="" method="post" class="registration-form">
                 <div class="form-group">
@@ -106,26 +139,6 @@
                 <button type="submit" style="text-align: center;
             margin: 0 auto;" class="btn btn-info text-center">Bid Now!</button>
             </form>
-        </div>
-        <div class="col-md-6">
-            <p>Ultimo Bidder -  {{ last_bidder }}</p>
-        </div>
-    </div>
-    <div class="col-xs-6 portfolio-item">
-        <div class="col-md-6">
-            <p>Dono do leilao:  {{ auction_owner[0] }}</p>
-        </div>
-        <div class="col-md-6">
-            <p>TAGS -
-                {% for tag in tags %}
-                    {{ tag[3] }}
-                {% endfor %}
-            </p>
-        </div>
-
-        <div class="col-md-6">
-            <a style="text-align: center;
-            margin: 0 auto;" href=""  class="btn btn-info text-center">Enviar Mensagem!</a>
         </div>
     </div>
 
