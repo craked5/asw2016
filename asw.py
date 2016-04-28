@@ -24,7 +24,7 @@ mysql = MySQL()
 app.config['MYSQL_DATABASE_USER'] = 'root'
 app.config['MYSQL_DATABASE_PASSWORD'] = 'halflife2'
 app.config['MYSQL_DATABASE_DB'] = 'asw'
-app.config['MYSQL_DATABASE_HOST'] = '163.172.132.51'
+app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 mysql.init_app(app)
 
 conn = mysql.connect()
