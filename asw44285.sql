@@ -32,6 +32,7 @@ CREATE TABLE `artigos` (
   `data_fim` datetime DEFAULT NULL,
   `melhor_lic` int(11) DEFAULT NULL,
   `melhor_val` decimal(10,2) DEFAULT NULL,
+  `anon_bid` INT(11) DEFAULT NULL
   PRIMARY KEY (`item_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -60,6 +61,7 @@ DROP TABLE IF EXISTS `licitacoes`;
 CREATE TABLE `licitacoes` (
   `user_id` int(11) NOT NULL DEFAULT '0',
   `item_id` int(11) NOT NULL DEFAULT '0',
+  `anon` int(11) NULL,
   `data_licit` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `valor` decimal(10,2) DEFAULT NULL,
   PRIMARY KEY (`user_id`,`item_id`,`data_licit`)

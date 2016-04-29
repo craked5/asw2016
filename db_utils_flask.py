@@ -15,7 +15,7 @@ def login(cur, username, password):
 
         user_id = cur.fetchone()[0]
 
-        cur.execute("SELECT pal_chave FROM palavraschave WHERE item_id = %s;", (user_id,))
+        cur.execute("SELECT pal_chave FROM palavraschave WHERE item_id = '%s';", (user_id,))
 
         if password == cur.fetchone()[0]:
             return True
@@ -127,8 +127,8 @@ def make_new_auction(conn, cur, nick, nome_artigo, desc_artigo, base_value, tags
             % (tag_id, user_id, max_auction_id, tags[index])
         cur.execute(querie_new_tags)
 
-    querie_new_auction = "INSERT INTO `artigos` VALUES (%s, '%s', %s, %s, '%s', '%s', '%s', %s, %s);" \
-                         % (max_auction_id, nome_artigo, user_id, base_value, desc_artigo, initial_date, end_date, "NULL", "NULL")
+    querie_new_auction = "INSERT INTO `artigos` VALUES (%s, '%s', %s, %s, '%s', '%s', '%s', %s, %s, %s);" \
+                         % (max_auction_id, nome_artigo, user_id, base_value, desc_artigo, initial_date, end_date, "NULL", "NULL", 0)
     if cur.execute(querie_new_auction) == 1:
         conn.commit()
         return True
@@ -143,16 +143,27 @@ def get_user_nick_from_userid(cur, user_id):
     cur.execute("SELECT nick FROM utilizadores WHERE user_id = %s", [user_id])
     return cur.fetchone()
 
-def update_bid_amount(conn, cur, bidder, item_id, bid):
+def update_bid_amount(conn, cur, bidder, item_id, data_bid, bid, anon):
+    print bidder
 
     user_id = get_user_id(cur, bidder)
 
-    update_bid_querie = "UPDATE `artigos` SET `melhor_lic`=%s, `melhor_val`= %s WHERE" \
-                        " `item_id`= %s;" % (user_id, bid, item_id)
+    if anon:
+        anonimo = 1
+    else:
+        anonimo = 0
+
+    update_bid_querie = "UPDATE `artigos` SET `melhor_lic`= %s, `melhor_val`= %s, anon_bid = %s WHERE" \
+                        " `item_id`= %s;" % (user_id, bid, anonimo, item_id)
+    print update_bid_querie
+
+    update_bid_table_querie = "INSERT INTO `licitacoes` VALUES (%s, %s, '%s', %s, %s);" \
+                              % (user_id, item_id, data_bid, bid, anonimo)
 
     if cur.execute(update_bid_querie) == 1:
-        conn.commit()
-        return True
+        if cur.execute(update_bid_table_querie) == 1:
+            conn.commit()
+            return True
     else:
         return False
 
@@ -179,3 +190,11 @@ def update_auction(conn, cur, nick, auction_id, nome_artigo, desc_artigo, base_v
         return True
     else:
         return False
+
+def get_auctions_participate(cur, username):
+
+        user = get_user_id(cur, username)
+
+        cur.execute("SELECT DISTINCT item_id FROM licitacoes where user_id = %s;", user)
+
+        my_parti_aucts = cur.fetchall()

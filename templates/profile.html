@@ -17,6 +17,7 @@
 
     <!-- jQuery -->
     <script src="{{ url_for('static', filename='js/jquery.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/socket.io.js') }}"></script>
 
     <!-- Bootstrap Core JavaScript -->
     <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
@@ -172,6 +173,46 @@
             </div>
             <div class="col-md-6">
                 <p>Ultimo Bid - {{ auctions_info[item][0][8] }}</p>
+            </div>
+        </div>
+    {% endfor %}
+    <h3 style="text-align: center;">
+        <a>Os Leiloes em que estou a participar!</a>
+    </h3>
+    {% for bid_item in bid_auctions %}
+        <div class="col-xs-6 col-sm-4 portfolio-item">
+            <a href="#">
+                <img class="img-responsive" src="http://www.verdisreviews.com/wp-content/uploads/2015/08/usat-2012-auction.jpg" alt="" title="" style="">
+            </a>
+            <div class="col-md-6">
+            <h3>
+                <a href="{{ url_for("leilao", item_id = auctions_info[bid_item][0][0]) }}">{{auctions_info[biditem][0][1]}}</a>
+            </h3>
+            </div>
+            <div class="col-md-6">
+                {% if datetime >= auctions_info[bid_item][0][5] %}
+                    <div class="alert alert-danger" role="alert">
+                        Nao e possivel editar o leilao porque este ja comecou!
+                    </div>
+                {% else %}
+                    <a href="{{ url_for("editar_leilao", item_id = auctions_info[bid_item][0][0]) }}"
+                       type="button" class="btn btn-info text-center">Alterar Info!</a>
+                {% endif %}
+                <a href="{{ url_for("leilao", item_id = auctions_info[bid_item][0][0]) }}"
+                           type="button" class="btn btn-info text-center">Ver Leilao!</a>
+            </div>
+            <div class="col-md-6">
+                <p>Data de Inicio: {{ auctions_info[bid_item][0][5] }}</p>
+            </div>
+            <br>
+            <div class="col-md-6">
+                <p>Valor Base - {{ auctions_info[bid_item][0][3] }}</p>
+            </div>
+            <div class="col-md-6">
+                <p>Data de Fim: {{ auctions_info[bid_item][0][6] }}</p>
+            </div>
+            <div class="col-md-6">
+                <p>Ultimo Bid - {{ auctions_info[bid_item][0][8] }}</p>
             </div>
         </div>
     {% endfor %}

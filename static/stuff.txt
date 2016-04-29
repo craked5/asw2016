@@ -1,0 +1,34 @@
+class BidsNamespace(BaseNamespace, BroadcastMixin):
+    def on_bid(self, bid_value):
+        self.broadcast_event('bid', bid_value)
+
+@app.route("/socket.io/<path:path>")
+def run_socketio(path):
+    socketio_manage(request.environ, {'': BaseNamespace})
+
+import os
+from werkzeug.wsgi import SharedDataMiddleware
+
+app = SharedDataMiddleware(app, {
+    '/': os.path.join(os.path.dirname(__file__), 'static')
+})
+from socketio.server import SocketIOServer
+
+SocketIOServer(('0.0.0.0', 8080), app,
+               resource="socket.io", policy_server=False).serve_forever()
+
+<script>
+    var socket = io.connect();
+
+    $(function () {
+        $('#bid_form').submit(function (ev) {
+            socket.emit('new_bid', $('#bid_amount').val());
+            return false;
+        });
+    });
+
+    socket.on('bid', function (msg) {
+        $('#last_bid').append($('<p>').text(msg));
+    });
+
+</script>

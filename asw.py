@@ -1,24 +1,28 @@
 from flask import Flask, render_template, request, session, redirect, escape, url_for, flash, make_response
 from flask.ext.mysql import MySQL
+from flask.ext.cache import Cache
 from werkzeug.security import generate_password_hash, check_password_hash
 from bs4 import BeautifulSoup
 import db_utils_flask
 import time
 import datetime
+from socketio import socketio_manage
+from socketio.namespace import BaseNamespace
+from socketio.mixins import BroadcastMixin
 
+
+class BidsNamespace(BaseNamespace, BroadcastMixin):
+    def on_bid(self, bid_value):
+        self.broadcast_event('bid', bid_value)
 
 app = Flask(__name__)
+
 app.config['DEBUG'] = True
+app.config['TRAP_BAD_REQUEST_ERRORS'] = True
 app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
-#app.config['SESSION_PERMANENT'] = False
-app.config['PERMANENT_SESSION_LIFETIME'] = 20000
-#app.config['SESSION_TYPE'] = 'filesystem'
-
-#UPLOAD_FOLDER = '/imagens_USER'
-#app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-#ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg'])
-
+cache = Cache(app,config={'CACHE_TYPE': 'simple'})
 mysql = MySQL()
+
 
 # MySQL configurations
 app.config['MYSQL_DATABASE_USER'] = 'root'
@@ -30,16 +34,32 @@ mysql.init_app(app)
 conn = mysql.connect()
 cur = conn.cursor()
 
+@app.route("/socket.io/<path:path>")
+def run_socketio(path):
+    socketio_manage(request.environ, {'': BaseNamespace})
+
 @app.route('/')
 def leiloes():
+    cache.clear()
     auctions = db_utils_flask.get_all_auctions(cur)
+    auctions_temp = []
+
+    for index, item in enumerate(auctions):
+        print datetime.datetime.today() >= item[6]
+        if datetime.datetime.today() <= item[6]:
+            auctions_temp.append(item)
+
+    print auctions_temp
 
     if 'username' in session:
         username_session = escape(session['username']).capitalize()
-        res = make_response(render_template('auctions.html', session_user_name=username_session, auctions = auctions))
+        res = make_response(render_template('auctions.html', session_user_name=username_session, auctions = auctions_temp))
         res.headers.set('Cache-Control', 'public, max-age=0')
         return res
-    return render_template('auctions.html', auctions=auctions)
+
+    res = make_response(render_template('auctions.html', auctions=auctions_temp))
+    res.headers.set('Cache-Control', 'public, max-age=0')
+    return res
 
 @app.after_request
 def add_header(response):
@@ -103,7 +123,9 @@ def registo():
 @app.route('/logout')
 def logout():
     session.pop('username', None)
-    return redirect(url_for('leiloes'))
+    res = make_response(redirect(url_for('leiloes')))
+    res.headers.set('Cache-Control', 'public, max-age=0')
+    return res
 
 @app.route('/admin', methods=["GET", "POST"])
 def admin():
@@ -163,7 +185,13 @@ def leilao(item_id):
     auction = db_utils_flask.get_user_auction(cur, item_id)
     auction_owner = db_utils_flask.get_user_nick_from_userid(cur, auction[0][2])
     tags = db_utils_flask.get_auction_tags(cur, item_id)
-    last_bidder = db_utils_flask.get_user_nick_from_userid(cur, auction[0][7])
+
+    if auction[0][9] == 1:
+        last_bidder = ["Anonimo"]
+    else:
+        last_bidder = db_utils_flask.get_user_nick_from_userid(cur, auction[0][7])
+
+    today = str(datetime.datetime.today())
 
     if last_bidder is None:
         last_bidder = []
@@ -174,31 +202,36 @@ def leilao(item_id):
         if datetime.datetime.today() > auction[0][6]:
             res = make_response(render_template("auction.html", session_user_name=session["username"], is_user_auction=False,
                                    tags=tags, auction_info=auction, auction_owner=auction_owner,
-                                   message="Este leilao ja acabou!", last_bidder = last_bidder[0]))
+                                   error="Este leilao ja acabou!", last_bidder = last_bidder[0]))
             res.headers.set('Cache-Control', 'public, max-age=0')
             return res
         elif datetime.datetime.today() < auction[0][5]:
             res =  make_response(render_template("auction.html", session_user_name=session["username"], is_user_auction=False,
                                    tags=tags, auction_info=auction, auction_owner=auction_owner,
-                                   message="Este leilao ainda nao comecou!", last_bidder=last_bidder[0]))
+                                   error="Este leilao ainda nao comecou!", last_bidder=last_bidder[0]))
             res.headers.set('Cache-Control', 'public, max-age=0')
             return res
 
         bid_amount = request.form["bid_amount"]
+        if request.form.get('anon') == "anon":
+            anon = True
+        else:
+            anon = False
+
 
         if auction[0][8] is not None:
 
             if float(bid_amount) <= float(auction[0][8]):
                 res = make_response(render_template("auction.html", is_user_auction=True, session_user_name=session["username"],
                                        tags=tags, auction_info=auction, auction_owner=auction_owner,
-                                       message="O valor da sua bid foi menor que o ultimo bid existente!", last_bidder=last_bidder[0]))
+                                       error="O valor da sua bid foi menor que o ultimo bid existente!", last_bidder=last_bidder[0]))
                 res.headers.set('Cache-Control', 'public, max-age=0')
                 return res
 
         if float(bid_amount) <= float(auction[0][3]):
             res = make_response(render_template("auction.html", is_user_auction=True, session_user_name=session["username"],
                                    tags=tags, auction_info=auction, auction_owner=auction_owner,
-                                   message="O valor da sua bid foi menor que o valor base!",
+                                   error="O valor da sua bid foi menor que o valor base!",
                                    last_bidder=last_bidder[0]))
             res.headers.set('Cache-Control', 'public, max-age=0')
             return res
@@ -206,21 +239,25 @@ def leilao(item_id):
         if auction_owner[0] == session["username"]:
             res = make_response(render_template("auction.html", is_user_auction=True, session_user_name=session["username"],
                                    tags=tags, auction_info=auction, auction_owner=auction_owner,
-                                   message="Nao pode fazer bids nos seus leiloes!",
+                                   error="Nao pode fazer bids nos seus leiloes!",
                                    last_bidder=last_bidder[0]))
             res.headers.set('Cache-Control', 'public, max-age=0')
             return res
 
-        if db_utils_flask.update_bid_amount(conn, cur, session["username"], auction[0][0], bid_amount):
+        if db_utils_flask.update_bid_amount(conn, cur, session["username"], auction[0][0], today ,bid_amount, anon):
+            if anon:
+                last_bidder = ["Anonimo"]
+            else:
+                last_bidder = [session["username"]]
             res = make_response(render_template("auction.html", is_user_auction=True, session_user_name=session["username"],
                                    tags=tags, auction_info=auction, auction_owner=auction_owner,
-                                   message="A sua bid foi aceite!", last_bidder = session["username"], new_bid = bid_amount))
+                                   message="A sua bid foi aceite!", last_bidder = last_bidder[0], new_bid = bid_amount))
             res.headers.set('Cache-Control', 'public, max-age=0')
             return res
         else:
             res = make_response(render_template("auction.html", is_user_auction=True, session_user_name=session["username"],
                                    tags=tags, auction_info=auction, auction_owner=auction_owner,
-                                   message="Ocurreu um error a fazer a sua bid", last_bidder = last_bidder[0]))
+                                   error="Ocurreu um error a fazer a sua bid", last_bidder = last_bidder[0]))
             res.headers.set('Cache-Control', 'public, max-age=0')
             return res
 
@@ -268,6 +305,10 @@ def perfil():
             print auction_number[0]
             auctions_dict[str(auction_number[0])] = db_utils_flask.get_user_auction(cur, auction_number[0])
             tags_dict[str(auction_number[0])] = db_utils_flask.get_auction_tags(cur, auction_number[0])
+
+        auctions_dict_participate = {}
+        tags_dict_participate = {}
+
 
         res = make_response(render_template("profile.html", session_user_name=session["username"], user_info=user_info,
                                auctions_info=auctions_dict, tags_info=tags_dict , datetime = datetime.datetime.today()))
@@ -338,5 +379,7 @@ def procurar():
 
     return render_template("search.html")
 
+
 if __name__ == '__main__':
     app.run(debug=True)
+

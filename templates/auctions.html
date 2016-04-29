@@ -18,6 +18,7 @@
 
     <!-- jQuery -->
     <script src="{{ url_for('static', filename='js/jquery.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/socket.io.js') }}"></script>
 
     <!-- Bootstrap Core JavaScript -->
     <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
@@ -103,7 +104,7 @@
                 <div class="col-md-6">
                     <p>Valor Base - {{ item[3] }}</p>
                 </div>
-                <div class="col-md-6">
+                <div id="last_bid" class="col-md-6">
                     {% if item[8]%}
                         <p>Ultimo Bid - {{ item[8] }}</p>
                     {% else %}
