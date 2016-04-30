@@ -59,12 +59,13 @@ DROP TABLE IF EXISTS `licitacoes`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `licitacoes` (
+  `bid_id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) NOT NULL DEFAULT '0',
   `item_id` int(11) NOT NULL DEFAULT '0',
   `anon` int(11) NULL,
   `data_licit` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `valor` decimal(10,2) DEFAULT NULL,
-  PRIMARY KEY (`user_id`,`item_id`,`data_licit`)
+  PRIMARY KEY (bid_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 

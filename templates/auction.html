@@ -123,9 +123,13 @@
         </p>
         </div>
 
-        <button type="button" class="btn btn-default" data-container="body" data-toggle="popover" data-placement="bottom" data-content="Vivamus
-            sagittis lacus vel augue laoreet rutrum faucibus.">
-            Popover on bottom
+        <button type="button" data-html="true" class="btn btn-default" data-container="body"
+                data-toggle="popover" data-placement="bottom"
+                data-content="
+                {% for lic in licitacoes %}
+                {{ "\n" +licitacoes[lic][0] + " | "}} {{ licitacoes[lic][1] }} {{ licitacoes[lic][2] }}
+                {% endfor %}">
+            Historico de Licitacoes
         </button>
         <div class="col-md-6">
             <a style="text-align: center;

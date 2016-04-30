@@ -185,13 +185,14 @@ def leilao(item_id):
     auction = db_utils_flask.get_user_auction(cur, item_id)
     auction_owner = db_utils_flask.get_user_nick_from_userid(cur, auction[0][2])
     tags = db_utils_flask.get_auction_tags(cur, item_id)
+    bids = db_utils_flask.get_all_bids_from_auction(cur, item_id)
 
     if auction[0][9] == 1:
         last_bidder = ["Anonimo"]
     else:
         last_bidder = db_utils_flask.get_user_nick_from_userid(cur, auction[0][7])
 
-    today = str(datetime.datetime.today())
+    today = datetime.datetime.today().strftime('%Y-%m-%d %H:%M:%S')
 
     if last_bidder is None:
         last_bidder = []
@@ -201,13 +202,13 @@ def leilao(item_id):
 
         if datetime.datetime.today() > auction[0][6]:
             res = make_response(render_template("auction.html", session_user_name=session["username"], is_user_auction=False,
-                                   tags=tags, auction_info=auction, auction_owner=auction_owner,
+                                   tags=tags, auction_info=auction, auction_owner=auction_owner, licitacoes=bids,
                                    error="Este leilao ja acabou!", last_bidder = last_bidder[0]))
             res.headers.set('Cache-Control', 'public, max-age=0')
             return res
         elif datetime.datetime.today() < auction[0][5]:
             res =  make_response(render_template("auction.html", session_user_name=session["username"], is_user_auction=False,
-                                   tags=tags, auction_info=auction, auction_owner=auction_owner,
+                                   tags=tags, auction_info=auction, auction_owner=auction_owner, licitacoes=bids,
                                    error="Este leilao ainda nao comecou!", last_bidder=last_bidder[0]))
             res.headers.set('Cache-Control', 'public, max-age=0')
             return res
@@ -223,14 +224,14 @@ def leilao(item_id):
 
             if float(bid_amount) <= float(auction[0][8]):
                 res = make_response(render_template("auction.html", is_user_auction=True, session_user_name=session["username"],
-                                       tags=tags, auction_info=auction, auction_owner=auction_owner,
+                                       tags=tags, auction_info=auction, auction_owner=auction_owner, licitacoes=bids,
                                        error="O valor da sua bid foi menor que o ultimo bid existente!", last_bidder=last_bidder[0]))
                 res.headers.set('Cache-Control', 'public, max-age=0')
                 return res
 
         if float(bid_amount) <= float(auction[0][3]):
             res = make_response(render_template("auction.html", is_user_auction=True, session_user_name=session["username"],
-                                   tags=tags, auction_info=auction, auction_owner=auction_owner,
+                                   tags=tags, auction_info=auction, auction_owner=auction_owner, licitacoes=bids,
                                    error="O valor da sua bid foi menor que o valor base!",
                                    last_bidder=last_bidder[0]))
             res.headers.set('Cache-Control', 'public, max-age=0')
@@ -238,7 +239,7 @@ def leilao(item_id):
 
         if auction_owner[0] == session["username"]:
             res = make_response(render_template("auction.html", is_user_auction=True, session_user_name=session["username"],
-                                   tags=tags, auction_info=auction, auction_owner=auction_owner,
+                                   tags=tags, auction_info=auction, auction_owner=auction_owner, licitacoes=bids,
                                    error="Nao pode fazer bids nos seus leiloes!",
                                    last_bidder=last_bidder[0]))
             res.headers.set('Cache-Control', 'public, max-age=0')
@@ -249,20 +250,22 @@ def leilao(item_id):
                 last_bidder = ["Anonimo"]
             else:
                 last_bidder = [session["username"]]
+            bids = db_utils_flask.get_all_bids_from_auction(cur, item_id)
             res = make_response(render_template("auction.html", is_user_auction=True, session_user_name=session["username"],
                                    tags=tags, auction_info=auction, auction_owner=auction_owner,
-                                   message="A sua bid foi aceite!", last_bidder = last_bidder[0], new_bid = bid_amount))
+                                   message="A sua bid foi aceite!", last_bidder = last_bidder[0],
+                                                new_bid = bid_amount, licitacoes=bids))
             res.headers.set('Cache-Control', 'public, max-age=0')
             return res
         else:
             res = make_response(render_template("auction.html", is_user_auction=True, session_user_name=session["username"],
-                                   tags=tags, auction_info=auction, auction_owner=auction_owner,
+                                   tags=tags, auction_info=auction, auction_owner=auction_owner, licitacoes=bids,
                                    error="Ocurreu um error a fazer a sua bid", last_bidder = last_bidder[0]))
             res.headers.set('Cache-Control', 'public, max-age=0')
             return res
 
     res = make_response(
-        render_template("auction.html", session_user_name=session["username"], is_user_auction=False,
+        render_template("auction.html", session_user_name=session["username"], is_user_auction=False, licitacoes=bids,
                         tags=tags, auction_info=auction, auction_owner=auction_owner, last_bidder=last_bidder[0]))
     res.headers.set('Cache-Control', 'public, max-age=0')
     return res
@@ -307,11 +310,15 @@ def perfil():
             tags_dict[str(auction_number[0])] = db_utils_flask.get_auction_tags(cur, auction_number[0])
 
         auctions_dict_participate = {}
-        tags_dict_participate = {}
 
+        auctions_dict_participate, last_bidders = db_utils_flask.get_auctions_participate(cur, session["username"])
+
+        print auctions_dict_participate
+        print last_bidders
 
         res = make_response(render_template("profile.html", session_user_name=session["username"], user_info=user_info,
-                               auctions_info=auctions_dict, tags_info=tags_dict , datetime = datetime.datetime.today()))
+                               auctions_info=auctions_dict, tags_info=tags_dict , datetime = datetime.datetime.today(),
+                                            bid_auctions=auctions_dict_participate, last_bidders=last_bidders))
         res.headers.set('Cache-Control', 'public, max-age=0')
         return res
 

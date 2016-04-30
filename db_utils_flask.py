@@ -1,4 +1,5 @@
 from flask.ext.mysql import MySQL
+from collections import OrderedDict
 from werkzeug.security import generate_password_hash, check_password_hash
 
 
@@ -153,13 +154,21 @@ def update_bid_amount(conn, cur, bidder, item_id, data_bid, bid, anon):
     else:
         anonimo = 0
 
+    querie_get_max_id = "SELECT MAX(bid_id)+1 from licitacoes"
+    if cur.execute(querie_get_max_id) == 1:
+        max_auction_id = cur.fetchone()[0]
+        if max_auction_id == None:
+            max_auction_id = 1
+    else:
+        return False
+
     update_bid_querie = "UPDATE `artigos` SET `melhor_lic`= %s, `melhor_val`= %s, anon_bid = %s WHERE" \
                         " `item_id`= %s;" % (user_id, bid, anonimo, item_id)
     print update_bid_querie
 
-    update_bid_table_querie = "INSERT INTO `licitacoes` VALUES (%s, %s, '%s', %s, %s);" \
-                              % (user_id, item_id, data_bid, bid, anonimo)
-
+    update_bid_table_querie = "INSERT INTO `licitacoes` VALUES (%s, %s, %s, %s, '%s', %s);" \
+                              % (max_auction_id, user_id, item_id, anonimo, data_bid, bid)
+    print update_bid_table_querie
     if cur.execute(update_bid_querie) == 1:
         if cur.execute(update_bid_table_querie) == 1:
             conn.commit()
@@ -194,7 +203,49 @@ def update_auction(conn, cur, nick, auction_id, nome_artigo, desc_artigo, base_v
 def get_auctions_participate(cur, username):
 
         user = get_user_id(cur, username)
+        cur.execute("SELECT DISTINCT item_id FROM licitacoes where user_id = %s;", [user])
+        my_biddings = cur.fetchall()
 
-        cur.execute("SELECT DISTINCT item_id FROM licitacoes where user_id = %s;", user)
+        auction_dict = {}
+        last_bidders = {}
+        i = 0
 
-        my_parti_aucts = cur.fetchall()
+        for bidding_auction in my_biddings:
+            i+=1
+            cur.execute("SELECT * from artigos where item_id = %s;", [bidding_auction])
+            auction_dict[i] = cur.fetchone()
+
+            if auction_dict[i][8] != None:
+                if auction_dict[i][9] != 1:
+                    last_bidders[i] = get_user_nick_from_userid(cur, auction_dict[i][7])[0]
+                else:
+                    last_bidders[i] = "Anonimo"
+            else:
+                last_bidders[i] = "Nenhum"
+
+        ordered = OrderedDict(sorted(auction_dict.items(), key=lambda t: t[1], reverse=True))
+        return (ordered, last_bidders)
+
+def get_all_bids_from_auction(cur, auction_id):
+
+    bids = {}
+    i = 0
+
+    cur.execute("SELECT * from licitacoes where item_id = %s;", [auction_id])
+    bids_raw = cur.fetchall()
+
+    for bid in bids_raw:
+        temp = []
+        if bid[3] != 1:
+            temp.append(get_user_nick_from_userid(cur, bid[1])[0])
+        else:
+            temp.append("Anonimo")
+        temp.append(bid[5])
+        temp.append(bid[4])
+
+        bids[bid[0]] = temp
+
+    return bids
+
+
+
