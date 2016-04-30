@@ -212,5 +212,39 @@
             </div>
         {% endfor %}
     </div>
+    <div class="row">
+        <h3 style="text-align: center; padding-top: 10px;">
+            <a>Leiloes que acabaram e participei!</a>
+        </h3>
+        {% for bid_item in bid_auctions %}
+            <div class="col-xs-6 col-sm-4 portfolio-item">
+                <a href="#">
+                    <img class="img-responsive" src="http://www.verdisreviews.com/wp-content/uploads/2015/08/usat-2012-auction.jpg" alt="" title="" style="">
+                </a>
+                <div class="col-md-6">
+                <h3>
+                    <a href="{{ url_for("leilao", item_id = bid_auctions[bid_item][0]) }}">{{bid_auctions[bid_item][1]}}</a>
+                </h3>
+                </div>
+                <div class="col-md-6">
+                    <a href="{{ url_for("leilao", item_id = bid_auctions[bid_item][0]) }}"
+                               type="button" class="btn btn-info text-center">Ver Leilao!</a>
+                </div>
+                <br>
+                <div class="col-md-6">
+                    <p>Valor Base - {{ bid_auctions[bid_item][3] }}</p>
+                </div>
+                <div class="col-md-6">
+                    <p>Data de Fim: {{ bid_auctions[bid_item][6] }}</p>
+                </div>
+                <div class="col-md-6">
+                    <p>Ultimo Bid - {{ bid_auctions[bid_item][8] }}</p>
+                </div>
+                <div class="col-md-6">
+                    <p>Ultimo Bidder - {{ last_bidders[bid_item] }}</p>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
 </body>
 </html>

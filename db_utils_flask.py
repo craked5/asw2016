@@ -248,4 +248,25 @@ def get_all_bids_from_auction(cur, auction_id):
     return bids
 
 
+def get_all_ended_auctions_participate(cur, user_id):
+
+    bids = {}
+    i = 0
+
+    cur.execute("SELECT DISTINCT item_id from licitacoes where user_id = %s;", [user_id])
+    bids_raw = cur.fetchall()
+    print "stuff"
+    print bids_raw
+
+    for bid in bids_raw:
+        temp = []
+        if bid[3] != 1:
+            temp.append(get_user_nick_from_userid(cur, bid[1])[0])
+        else:
+            temp.append("Anonimo")
+        temp.append(bid[5])
+        temp.append(bid[4])
+
+        bids[bid[0]] = temp
+
 

@@ -23,8 +23,14 @@
     <!-- Bootstrap Core JavaScript -->
     <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
     <script>
-        $(document).ready(function(){
-            $('[data-toggle="popover"]').popover();
+        $(function(){
+            // Enabling Popover Example 2 - JS (hidden content and title capturing)
+            $("#historyPopover").popover({
+                html : true,
+                content: function() {
+                  return $('#historyBids').html();
+                }
+            });
         });
     </script>
 </head>
@@ -122,15 +128,15 @@
             {% endfor %}
         </p>
         </div>
-
-        <button type="button" data-html="true" class="btn btn-default" data-container="body"
-                data-toggle="popover" data-placement="bottom"
-                data-content="
-                {% for lic in licitacoes %}
-                {{ "\n" +licitacoes[lic][0] + " | "}} {{ licitacoes[lic][1] }} {{ licitacoes[lic][2] }}
-                {% endfor %}">
-            Historico de Licitacoes
-        </button>
+        <div class="col-md-6">
+        <a href="#" style="max-width: 350px;" data-placement="bottom" id="historyPopover">Historico de Bids!</a>
+        <div id="historyBids" style="display: none">
+            {% for lic in licitacoes %}
+            {{ licitacoes[lic][0]}} | {{ licitacoes[lic][1]}} | {{ licitacoes[lic][2]}}
+                <br>
+            {% endfor %}
+        </div>
+        </div>
         <div class="col-md-6">
             <a style="text-align: center;
             margin: 0 auto;" href=""  class="btn btn-info text-center">Enviar Mensagem!</a>
@@ -146,7 +152,7 @@
                     </div>
                 </div>
                 <button type="submit" style="text-align: center;
-            margin: 0 auto;" class="btn btn-info text-center">Bid Now!</button>
+            margin: 0 auto;" class="btn btn-info text-center">Bid!</button>
             </form>
         </div>
     </div>
