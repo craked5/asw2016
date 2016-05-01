@@ -69,10 +69,10 @@ def thread_email_sender(cur):
 
 app = Flask(__name__)
 
-email_server = smtplib.SMTP("smtp.gmail.com", 587)
+email_server = smtplib.SMTP_SSL("smtp.live.com", 465)
 email_server.ehlo()
-email_server.starttls()
-email_server.login("opskinsemailsender@gmail.com", "opskins123")
+#email_server.starttls()
+email_server.login("asw_leiloes@hotmail.com", "halflife2")
 
 app.config['DEBUG'] = True
 app.config['TRAP_BAD_REQUEST_ERRORS'] = True
