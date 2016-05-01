@@ -6,16 +6,73 @@ from bs4 import BeautifulSoup
 import db_utils_flask
 import time
 import datetime
-from socketio import socketio_manage
-from socketio.namespace import BaseNamespace
-from socketio.mixins import BroadcastMixin
+import smtpd
+import smtplib
+import time
+import threading
 
+class emailSender (threading.Thread):
+    def __init__(self, threadID, name, counter, cur):
+        threading.Thread.__init__(self)
+        self.threadID = threadID
+        self.name = name
+        self.counter = counter
+        self.cur = cur
 
-class BidsNamespace(BaseNamespace, BroadcastMixin):
-    def on_bid(self, bid_value):
-        self.broadcast_event('bid', bid_value)
+    def run(self):
+        print "Starting " + self.name
+        thread_email_sender(self.cur)
+        print "Exiting " + self.name
+
+def send_email_new_item(email_server, FROM, TO_seller, TO_buyer, item_name, item_url):
+
+    SUBJECT_seller = "Parabens, vendeu o item " + item_name
+    SUBJECT_buyer = "Parabens, ganhou o item " + item_name
+    text_seller = "Voce vendeu o seu item " + item_name + "! \n Pode visitar o item em causa em " + item_url
+    text_buyer = "Voce ganhou o item " + item_name + "! \n Pode visitar o item em causa em " + item_url
+
+    try:
+        message_seller = """\From: %s\nTo: %s\nSubject: %s\n\n%s""" % (FROM, ", ".join(TO_seller), SUBJECT_seller, text_seller)
+        message_buyer = """\From: %s\nTo: %s\nSubject: %s\n\n%s""" % (FROM, ", ".join(TO_buyer), SUBJECT_buyer, text_buyer)
+        email_server.sendmail(FROM, TO_seller, message_seller)
+        email_server.sendmail(FROM, TO_buyer, message_buyer)
+    except smtplib.SMTPRecipientsRefused:
+        print 'The email was not sent, the target refused'
+        return False
+    except smtplib.SMTPServerDisconnected:
+        print 'The server is disconnected.'
+        return False
+    except:
+        print 'SHIT HAPPENED DEAL WITH IT'
+        return False
+
+def thread_email_sender(cur):
+    print "STARTED EMAIL SENDER THREAD!"
+    while True:
+        cur.execute("SELECT * FROM artigos;")
+        auctions = cur.fetchall()
+        for auct in auctions:
+            if datetime.datetime.today() >= auct[6]:
+                if auct[8] != None:
+                    cur.execute("SELECT * FROM utilizadores where user_id = %s;", [auct[7]])
+                    auct_winner = cur.fetchone()
+                    cur.execute("SELECT email from utilizadores where user_id = %s;", [auct[2]])
+                    auct_seller = cur.fetchone()[0]
+
+                    send_email_new_item(email_server, "opskinsemailsender@gmail.com", auct_seller,
+                                        auct_winner[5], auct[1], "http://163.172.132.51/leiloes/"+str(auct[0]))
+                    print "Sent email to buyer " + auct_winner[5]
+                    print "Sent email to seller" + auct_seller
+        time.sleep(30)
+
+#------------------------------------------------APP CONFIG AND THREADING------------------------------------------------
 
 app = Flask(__name__)
+
+email_server = smtplib.SMTP("smtp.gmail.com", 587)
+email_server.ehlo()
+email_server.starttls()
+email_server.login("opskinsemailsender@gmail.com", "opskins123")
 
 app.config['DEBUG'] = True
 app.config['TRAP_BAD_REQUEST_ERRORS'] = True
@@ -34,9 +91,13 @@ mysql.init_app(app)
 conn = mysql.connect()
 cur = conn.cursor()
 
-@app.route("/socket.io/<path:path>")
-def run_socketio(path):
-    socketio_manage(request.environ, {'': BaseNamespace})
+thread1 = emailSender(1, "emailSenderThread", 1, cur)
+thread1.start()
+print threading.activeCount()
+print threading.enumerate()
+
+#------------------------------------------------FLASK ROUTES------------------------------------------------
+
 
 @app.route('/')
 def leiloes():
@@ -321,13 +382,17 @@ def perfil():
 
         auctions_dict_participate, last_bidders = db_utils_flask.get_auctions_participate(cur, session["username"])
 
+        #last_bidders_ended = {}
+        aucts_dict_participate_end = {}
         for aucts in auctions_dict_participate:
             if auctions_dict_participate[aucts][6] <= datetime.datetime.today():
-
+                aucts_dict_participate_end[auctions_dict_participate[0]] = aucts
+                #last_bidders_ended[auctions_dict_participate[0]] = last_bidders[auctions_dict_participate[0]]
 
         res = make_response(render_template("profile.html", session_user_name=session["username"], user_info=user_info,
                                auctions_info=auctions_dict, tags_info=tags_dict , datetime = datetime.datetime.today(),
-                                            bid_auctions=auctions_dict_participate, last_bidders=last_bidders))
+                                bid_auctions_ended=aucts_dict_participate_end, bid_auctions=auctions_dict_participate,
+                                last_bidders=last_bidders))
         res.headers.set('Cache-Control', 'public, max-age=0')
         return res
 
@@ -398,4 +463,5 @@ def procurar():
 
 if __name__ == '__main__':
     app.run(debug=True)
+
 
