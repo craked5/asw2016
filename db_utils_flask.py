@@ -128,8 +128,8 @@ def make_new_auction(conn, cur, nick, nome_artigo, desc_artigo, base_value, tags
             % (tag_id, user_id, max_auction_id, tags[index])
         cur.execute(querie_new_tags)
 
-    querie_new_auction = "INSERT INTO `artigos` VALUES (%s, '%s', %s, %s, '%s', '%s', '%s', %s, %s, %s);" \
-                         % (max_auction_id, nome_artigo, user_id, base_value, desc_artigo, initial_date, end_date, "NULL", "NULL", 0)
+    querie_new_auction = "INSERT INTO `artigos` VALUES (%s, '%s', %s, %s, '%s', '%s', '%s', %s, %s, %s, %s);" \
+                         % (max_auction_id, nome_artigo, user_id, base_value, desc_artigo, initial_date, end_date, "NULL", "NULL", 0, 0)
     if cur.execute(querie_new_auction) == 1:
         conn.commit()
         return True
