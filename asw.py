@@ -1,6 +1,5 @@
 from flask import Flask, render_template, request, session, redirect, escape, url_for, flash, make_response
 from flask.ext.mysql import MySQL
-from flask.ext.cache import Cache
 from werkzeug.security import generate_password_hash, check_password_hash
 from bs4 import BeautifulSoup
 import db_utils_flask
@@ -12,16 +11,15 @@ import time
 import threading
 
 class emailSender (threading.Thread):
-    def __init__(self, threadID, name, counter, cur):
+    def __init__(self, threadID, name, counter, cur, conn):
         threading.Thread.__init__(self)
         self.threadID = threadID
         self.name = name
         self.counter = counter
-        self.cur = cur
 
     def run(self):
         print "Starting " + self.name
-        thread_email_sender(self.cur)
+        thread_email_sender()
         print "Exiting " + self.name
 
 def send_email_new_item(email_server, FROM, TO_seller, TO_buyer, item_name, item_url):
@@ -36,6 +34,7 @@ def send_email_new_item(email_server, FROM, TO_seller, TO_buyer, item_name, item
         message_buyer = """\From: %s\nTo: %s\nSubject: %s\n\n%s""" % (FROM, ", ".join(TO_buyer), SUBJECT_buyer, text_buyer)
         email_server.sendmail(FROM, TO_seller, message_seller)
         email_server.sendmail(FROM, TO_buyer, message_buyer)
+        return True
     except smtplib.SMTPRecipientsRefused:
         print 'The email was not sent, the target refused'
         return False
@@ -46,7 +45,10 @@ def send_email_new_item(email_server, FROM, TO_seller, TO_buyer, item_name, item
         print 'SHIT HAPPENED DEAL WITH IT'
         return False
 
-def thread_email_sender(cur):
+def thread_email_sender():
+    global cur
+    global conn
+
     print "STARTED EMAIL SENDER THREAD!"
     while True:
         cur.execute("SELECT * FROM artigos;")
@@ -54,18 +56,17 @@ def thread_email_sender(cur):
         for auct in auctions:
             if datetime.datetime.today() >= auct[6]:
                 if auct[8] != None:
-                    if db_utils_flask.set_email_sent(conn, cur, auct[0]):
-                        cur.execute("SELECT * FROM utilizadores where user_id = %s;", [auct[7]])
-                        auct_winner = cur.fetchone()
-                        cur.execute("SELECT email from utilizadores where user_id = %s;", [auct[2]])
-                        auct_seller = cur.fetchone()[0]
+                    db_utils_flask.set_email_sent(conn, cur, auct[0])
+                    cur.execute("SELECT * FROM utilizadores where user_id = %s;", [auct[7]])
+                    auct_winner = cur.fetchone()
+                    cur.execute("SELECT email from utilizadores where user_id = %s;", [auct[2]])
+                    auct_seller = cur.fetchone()[0]
 
-                        send_email_new_item(email_server, "opskinsemailsender@gmail.com", auct_seller,
-                                            auct_winner[5], auct[1], "http://163.172.132.51/leiloes/"+str(auct[0]))
+                    if send_email_new_item(email_server, "opskinsemailsender@gmail.com", auct_seller,
+                                        auct_winner[5], auct[1], "http://163.172.132.51/leiloes/"+str(auct[0])):
+                        db_utils_flask.set_email_sent(conn,cur,auct[0])
                         print "Sent email to buyer " + auct_winner[5]
                         print "Sent email to seller" + auct_seller
-                    else:
-                        print "CANT SEND VICTORY EMAIL! CHECK DB"
         time.sleep(30)
 
 #------------------------------------------------APP CONFIG AND THREADING------------------------------------------------
@@ -94,7 +95,7 @@ mysql.init_app(app)
 conn = None
 cur = None
 
-thread1 = emailSender(1, "emailSenderThread", 1, cur)
+thread1 = emailSender(1, "emailSenderThread", 1)
 thread1.start()
 print threading.activeCount()
 print threading.enumerate()
