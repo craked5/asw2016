@@ -11,7 +11,7 @@ import time
 import threading
 
 class emailSender (threading.Thread):
-    def __init__(self, threadID, name, counter, cur, conn):
+    def __init__(self, threadID, name, counter):
         threading.Thread.__init__(self)
         self.threadID = threadID
         self.name = name
@@ -73,7 +73,7 @@ def thread_email_sender():
 
 app = Flask(__name__)
 
-email_server = smtplib.SMTP_SSL("smtp.live.com", 25)
+email_server = smtplib.SMTP("smtp.live.com", 25)
 email_server.ehlo()
 email_server.starttls()
 email_server.login("asw_leiloes@hotmail.com", "halflife2")
@@ -92,8 +92,8 @@ app.config['MYSQL_DATABASE_DB'] = 'asw'
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 mysql.init_app(app)
 
-conn = None
-cur = None
+conn = mysql.connect()
+cur = conn.cursor()
 
 thread1 = emailSender(1, "emailSenderThread", 1)
 thread1.start()
