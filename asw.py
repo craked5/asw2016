@@ -54,30 +54,33 @@ def thread_email_sender(cur):
         for auct in auctions:
             if datetime.datetime.today() >= auct[6]:
                 if auct[8] != None:
-                    cur.execute("SELECT * FROM utilizadores where user_id = %s;", [auct[7]])
-                    auct_winner = cur.fetchone()
-                    cur.execute("SELECT email from utilizadores where user_id = %s;", [auct[2]])
-                    auct_seller = cur.fetchone()[0]
+                    if db_utils_flask.set_email_sent(conn, cur, auct[0]):
+                        cur.execute("SELECT * FROM utilizadores where user_id = %s;", [auct[7]])
+                        auct_winner = cur.fetchone()
+                        cur.execute("SELECT email from utilizadores where user_id = %s;", [auct[2]])
+                        auct_seller = cur.fetchone()[0]
 
-                    send_email_new_item(email_server, "opskinsemailsender@gmail.com", auct_seller,
-                                        auct_winner[5], auct[1], "http://163.172.132.51/leiloes/"+str(auct[0]))
-                    print "Sent email to buyer " + auct_winner[5]
-                    print "Sent email to seller" + auct_seller
+                        send_email_new_item(email_server, "opskinsemailsender@gmail.com", auct_seller,
+                                            auct_winner[5], auct[1], "http://163.172.132.51/leiloes/"+str(auct[0]))
+                        print "Sent email to buyer " + auct_winner[5]
+                        print "Sent email to seller" + auct_seller
+                    else:
+                        print "CANT SEND VICTORY EMAIL! CHECK DB"
         time.sleep(30)
 
 #------------------------------------------------APP CONFIG AND THREADING------------------------------------------------
 
 app = Flask(__name__)
 
-email_server = smtplib.SMTP_SSL("smtp.live.com", 465)
+email_server = smtplib.SMTP_SSL("smtp.live.com", 25)
 email_server.ehlo()
-#email_server.starttls()
+email_server.starttls()
 email_server.login("asw_leiloes@hotmail.com", "halflife2")
 
 app.config['DEBUG'] = True
 app.config['TRAP_BAD_REQUEST_ERRORS'] = True
+app.config['SESSION_PERMANENT'] = False
 app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
-cache = Cache(app,config={'CACHE_TYPE': 'simple'})
 mysql = MySQL()
 
 
@@ -88,8 +91,8 @@ app.config['MYSQL_DATABASE_DB'] = 'asw'
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 mysql.init_app(app)
 
-conn = mysql.connect()
-cur = conn.cursor()
+conn = None
+cur = None
 
 thread1 = emailSender(1, "emailSenderThread", 1, cur)
 thread1.start()
@@ -98,10 +101,20 @@ print threading.enumerate()
 
 #------------------------------------------------FLASK ROUTES------------------------------------------------
 
+@app.before_request
+def per_request_callbacks(response):
+    conn = mysql.connect()
+    cur = conn.cursor()
+    return response
+
+@app.after_request
+def per_request_callbacks(response):
+    conn.close()
+    return response
+
 
 @app.route('/')
 def leiloes():
-    cache.clear()
     auctions = db_utils_flask.get_all_auctions(cur)
     auctions_temp = []
 

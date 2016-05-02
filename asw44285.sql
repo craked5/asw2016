@@ -33,6 +33,7 @@ CREATE TABLE `artigos` (
   `melhor_lic` int(11) DEFAULT NULL,
   `melhor_val` decimal(10,2) DEFAULT NULL,
   `anon_bid` INT(11) DEFAULT 0 NULL,
+  `sent_email` INT(11) DEFAULT 0 NOT NULL,
   PRIMARY KEY (`item_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;

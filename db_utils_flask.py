@@ -269,4 +269,14 @@ def get_all_ended_auctions_participate(cur, user_id):
 
         bids[bid[0]] = temp
 
+def set_email_sent(conn, cur, item_id):
+
+    querie = "UPDATE `artigos` SET `sent_email`= 1 WHERE" \
+                        " `item_id`= %s;" % (item_id)
+
+    if cur.execute(querie) == 1:
+        conn.commit()
+        return True
+    else:
+        return False
 
