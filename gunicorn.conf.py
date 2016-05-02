@@ -1,7 +1,7 @@
 import os
 
-bind = '0.0.0.0:80'
-workers = 3
+bind = '0.0.0.0:8000'
+workers = 1
 backlog = 2048
 worker_class = "sync"
 daemon = True
