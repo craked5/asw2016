@@ -1,14 +1,13 @@
-from flask import Flask, render_template, request, session, redirect, escape, url_for, flash, make_response
+from flask import Flask, render_template, request, session, redirect, escape, url_for, flash, make_response, g
 from flask.ext.mysql import MySQL
 from werkzeug.security import generate_password_hash, check_password_hash
 from bs4 import BeautifulSoup
 import db_utils_flask
-import time
 import datetime
-import smtpd
 import smtplib
 import time
 import threading
+import random
 
 class emailSender (threading.Thread):
     def __init__(self, threadID, name, counter):
@@ -46,28 +45,29 @@ def send_email_new_item(email_server, FROM, TO_seller, TO_buyer, item_name, item
         return False
 
 def thread_email_sender():
-    global cur
-    global conn
-
     print "STARTED EMAIL SENDER THREAD!"
     while True:
-        cur.execute("SELECT * FROM artigos;")
-        auctions = cur.fetchall()
+        conn_thread = mysql.connect()
+        cur_thread = conn_thread.cursor()
+        cur_thread.execute("SELECT * FROM artigos;")
+        auctions = cur_thread.fetchall()
         for auct in auctions:
             if datetime.datetime.today() >= auct[6]:
                 if auct[8] != None:
-                    db_utils_flask.set_email_sent(conn, cur, auct[0])
-                    cur.execute("SELECT * FROM utilizadores where user_id = %s;", [auct[7]])
-                    auct_winner = cur.fetchone()
-                    cur.execute("SELECT email from utilizadores where user_id = %s;", [auct[2]])
-                    auct_seller = cur.fetchone()[0]
+                    db_utils_flask.set_email_sent(conn_thread, cur_thread, auct[0])
+                    cur_thread.execute("SELECT * FROM utilizadores where user_id = %s;", [auct[7]])
+                    auct_winner = cur_thread.fetchone()
+                    cur_thread.execute("SELECT email from utilizadores where user_id = %s;", [auct[2]])
+                    auct_seller = cur_thread.fetchone()[0]
 
                     if send_email_new_item(email_server, "opskinsemailsender@gmail.com", auct_seller,
                                         auct_winner[5], auct[1], "http://163.172.132.51/leiloes/"+str(auct[0])):
-                        db_utils_flask.set_email_sent(conn,cur,auct[0])
+                        db_utils_flask.set_email_sent(conn_thread, cur_thread,auct[0])
                         print "Sent email to buyer " + auct_winner[5]
                         print "Sent email to seller" + auct_seller
-        time.sleep(30)
+        conn_thread.close()
+        time.sleep(random.randrange(30,60))
+
 
 #------------------------------------------------APP CONFIG AND THREADING------------------------------------------------
 
@@ -92,9 +92,6 @@ app.config['MYSQL_DATABASE_DB'] = 'asw'
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 mysql.init_app(app)
 
-conn = mysql.connect()
-cur = conn.cursor()
-
 thread1 = emailSender(1, "emailSenderThread", 1)
 thread1.start()
 print threading.activeCount()
@@ -103,20 +100,17 @@ print threading.enumerate()
 #------------------------------------------------FLASK ROUTES------------------------------------------------
 
 @app.before_request
-def per_request_callbacks(response):
-    conn = mysql.connect()
-    cur = conn.cursor()
-    return response
+def before_request_callbacks():
+    g.conn = mysql.connect()
+    g.cur = g.conn.cursor()
 
-@app.after_request
-def per_request_callbacks(response):
-    conn.close()
-    return response
-
+@app.teardown_request
+def close_db(*args):
+    g.conn.close()
 
 @app.route('/')
 def leiloes():
-    auctions = db_utils_flask.get_all_auctions(cur)
+    auctions = db_utils_flask.get_all_auctions(g.cur)
     auctions_temp = []
 
     for index, item in enumerate(auctions):
@@ -130,6 +124,7 @@ def leiloes():
         username_session = escape(session['username']).capitalize()
         res = make_response(render_template('auctions.html', session_user_name=username_session, auctions = auctions_temp))
         res.headers.set('Cache-Control', 'public, max-age=0')
+
         return res
 
     res = make_response(render_template('auctions.html', auctions=auctions_temp))
@@ -155,7 +150,7 @@ def login():
         username_form  = request.form['username']
         password_form  = request.form['password']
 
-        l_res = db_utils_flask.login(cur, username_form, password_form)
+        l_res = db_utils_flask.login(g.cur, username_form, password_form)
         error= l_res
         if l_res is True:
             session["username"] = username_form
@@ -188,7 +183,7 @@ def registo():
                 error = "HTML detetado em " + str(key)
                 return render_template('register.html', error=error)
 
-        if db_utils_flask.register(conn, cur, info["username"], info["email"], info["password"], info["first_name"],
+        if db_utils_flask.register(g.conn, g.cur, info["username"], info["email"], info["password"], info["first_name"],
                                 info["last_name"], info["gender"], info["country"],
                                 info["birth_date"], info["conselho"], info["district"]) == True:
             return render_template("auctions.html", message="Regist was done good, please login!")
@@ -206,7 +201,7 @@ def logout():
 def admin():
     error = None
     if 'username' in session:
-        if db_utils_flask.is_admin(cur, session['username']) == 1:
+        if db_utils_flask.is_admin(g.cur, session['username']) == 1:
             return redirect(url_for('admin_logged'))
         else:
             return redirect(url_for("leiloes"))
@@ -214,8 +209,8 @@ def admin():
     if request.method == 'POST':
         username_form = request.form['username']
         password_form = request.form['password']
-        if db_utils_flask.is_admin(cur, username_form) == 1:
-            l_res = db_utils_flask.login(cur, username_form, password_form)
+        if db_utils_flask.is_admin(g.cur, username_form) == 1:
+            l_res = db_utils_flask.login(g.cur, username_form, password_form)
             error= l_res
             if l_res is True:
                 session["username"] = username_form
@@ -234,10 +229,10 @@ def admin_logged():
     message = ''
 
     if 'username' in session:
-        if db_utils_flask.is_admin(cur, session["username"]) == 1:
+        if db_utils_flask.is_admin(g.cur, session["username"]) == 1:
             if request.method == 'POST':
                 username_email  = request.form['username_email']
-                res = db_utils_flask.search_user(cur, username_email)
+                res = db_utils_flask.search_user(g.cur, username_email)
 
                 if res != False:
                     for index, key in enumerate(res):
@@ -257,15 +252,15 @@ def admin_logged():
 @app.route("/leilao/<item_id>", methods=["GET", "POST"])
 def leilao(item_id):
 
-    auction = db_utils_flask.get_user_auction(cur, item_id)
-    auction_owner = db_utils_flask.get_user_nick_from_userid(cur, auction[0][2])
-    tags = db_utils_flask.get_auction_tags(cur, item_id)
-    bids = db_utils_flask.get_all_bids_from_auction(cur, item_id)
+    auction = db_utils_flask.get_user_auction(g.cur, item_id)
+    auction_owner = db_utils_flask.get_user_nick_from_userid(g.cur, auction[0][2])
+    tags = db_utils_flask.get_auction_tags(g.cur, item_id)
+    bids = db_utils_flask.get_all_bids_from_auction(g.cur, item_id)
 
     if auction[0][9] == 1:
         last_bidder = ["Anonimo"]
     else:
-        last_bidder = db_utils_flask.get_user_nick_from_userid(cur, auction[0][7])
+        last_bidder = db_utils_flask.get_user_nick_from_userid(g.cur, auction[0][7])
 
     today = datetime.datetime.today().strftime('%Y-%m-%d %H:%M:%S')
 
@@ -320,12 +315,12 @@ def leilao(item_id):
                 res.headers.set('Cache-Control', 'public, max-age=0')
                 return res
 
-            if db_utils_flask.update_bid_amount(conn, cur, session["username"], auction[0][0], today ,bid_amount, anon):
+            if db_utils_flask.update_bid_amount(g.conn, g.cur, session["username"], auction[0][0], today ,bid_amount, anon):
                 if anon:
                     last_bidder = ["Anonimo"]
                 else:
                     last_bidder = [session["username"]]
-                bids = db_utils_flask.get_all_bids_from_auction(cur, item_id)
+                bids = db_utils_flask.get_all_bids_from_auction(g.cur, item_id)
                 res = make_response(render_template("auction.html", is_user_auction=True, session_user_name=session["username"],
                                        tags=tags, auction_info=auction, auction_owner=auction_owner,
                                        message="A sua bid foi aceite!", last_bidder = last_bidder[0],
@@ -368,7 +363,7 @@ def leiloar():
             info["data_inicio"] = request.form['data-inicio']
             info["data_fim"] = request.form['data-fim']
 
-            if db_utils_flask.make_new_auction(conn,cur,session["username"], info["nome_artigo"], info["descricao_artigo"],
+            if db_utils_flask.make_new_auction(g.conn,g.cur,session["username"], info["nome_artigo"], info["descricao_artigo"],
                                                info["valor_base"], info["tags"], info["data_inicio"], info["data_fim"]):
                 return render_template("new_auction.html", message="Leilao criado com sucesso!",
                                        session_user_name = session["username"])
@@ -385,16 +380,16 @@ def perfil():
 
         auctions_dict = {}
         tags_dict = {}
-        user_info = db_utils_flask.get_user_info(cur, session["username"])
+        user_info = db_utils_flask.get_user_info(g.cur, session["username"])
 
-        user_number_auctions = db_utils_flask.get_user_auctions_number(cur, session["username"])
+        user_number_auctions = db_utils_flask.get_user_auctions_number(g.cur, session["username"])
 
         for auction_number in user_number_auctions:
             print auction_number[0]
-            auctions_dict[str(auction_number[0])] = db_utils_flask.get_user_auction(cur, auction_number[0])
-            tags_dict[str(auction_number[0])] = db_utils_flask.get_auction_tags(cur, auction_number[0])
+            auctions_dict[str(auction_number[0])] = db_utils_flask.get_user_auction(g.cur, auction_number[0])
+            tags_dict[str(auction_number[0])] = db_utils_flask.get_auction_tags(g.cur, auction_number[0])
 
-        auctions_dict_participate, last_bidders = db_utils_flask.get_auctions_participate(cur, session["username"])
+        auctions_dict_participate, last_bidders = db_utils_flask.get_auctions_participate(g.cur, session["username"])
 
         #last_bidders_ended = {}
         aucts_dict_participate_end = {}
@@ -414,10 +409,10 @@ def perfil():
 def editar_leilao(item_id):
     if "username" in session:
 
-        auction = db_utils_flask.get_user_auction(cur, item_id)
-        auction_owner = db_utils_flask.get_user_nick_from_userid(cur, auction[0][2])
-        tags = db_utils_flask.get_auction_tags(cur, item_id)
-        last_bidder = db_utils_flask.get_user_nick_from_userid(cur, auction[0][7])
+        auction = db_utils_flask.get_user_auction(g.cur, item_id)
+        auction_owner = db_utils_flask.get_user_nick_from_userid(g.cur, auction[0][2])
+        tags = db_utils_flask.get_auction_tags(g.cur, item_id)
+        last_bidder = db_utils_flask.get_user_nick_from_userid(g.cur, auction[0][7])
 
         if last_bidder is None:
             last_bidder = []
@@ -447,14 +442,14 @@ def editar_leilao(item_id):
                                        auction_info=auction, tags=tags, last_bidder="Nenhum",
                                        auction_owner=auction_owner)
 
-            if db_utils_flask.update_auction(conn, cur, session["username"], auction[0][0], info["nome_artigo"],
+            if db_utils_flask.update_auction(g.conn, g.cur, session["username"], auction[0][0], info["nome_artigo"],
                                                info["descricao_artigo"],
                                                info["valor_base"], info["tags"], info["data_inicio"],
                                                info["data_fim"]):
 
-                auction = db_utils_flask.get_user_auction(cur, item_id)
-                auction_owner = db_utils_flask.get_user_nick_from_userid(cur, auction[0][2])
-                tags = db_utils_flask.get_auction_tags(cur, item_id)
+                auction = db_utils_flask.get_user_auction(g.cur, item_id)
+                auction_owner = db_utils_flask.get_user_nick_from_userid(g.cur, auction[0][2])
+                tags = db_utils_flask.get_auction_tags(g.cur, item_id)
                 return render_template("auction.html", message="Leilao editado com sucesso!",
                                        session_user_name=session["username"],
                                        auction_info=auction, tags=tags, last_bidder="Nenhum", auction_owner=auction_owner)
