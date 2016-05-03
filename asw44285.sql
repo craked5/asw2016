@@ -157,4 +157,4 @@ CREATE TABLE `utilizadores` (
 INSERT INTO `utilizadores` VALUES (1, 1, 'admin', 'Nuno', 'Silva', 'nunomipsilva@gmail.com', 'PT', 'LISBOA', 'LISBOA', null, null);
 INSERT INTO `utilizadores` VALUES (2, 1, 'craked5', 'Nuno', 'Silva', 'craked5@gmail.com', 'PT', 'LISBOA', 'LISBOA', null, null);
 INSERT INTO `artigos` VALUES (1, 'stuff1', 1, 100, 'stuff1', '2016-04-28 00:00:00', '2016-05-28 00:00:00', null, null, 0, 0);
-INSERT INTO `artigos` VALUES (1, 'stuff2', 2, 200, 'stuff2', '2016-04-29 00:00:00', '2016-05-21 00:00:00', null, null, 0, 0);
+INSERT INTO `artigos` VALUES (2, 'stuff2', 2, 200, 'stuff2', '2016-04-29 00:00:00', '2016-05-21 00:00:00', null, null, 0, 0);
