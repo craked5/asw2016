@@ -47,6 +47,10 @@ def send_email_new_item(email_server, FROM, TO_seller, TO_buyer, item_name, item
 def thread_email_sender():
     print "STARTED EMAIL SENDER THREAD!"
     while True:
+        email_server = smtplib.SMTP("smtp.live.com", 25)
+        email_server.ehlo()
+        email_server.starttls()
+        email_server.login("asw_leiloes@hotmail.com", "halflife2")
         conn_thread = mysql.connect()
         cur_thread = conn_thread.cursor()
         cur_thread.execute("SELECT * FROM artigos;")
@@ -65,18 +69,14 @@ def thread_email_sender():
                         db_utils_flask.set_email_sent(conn_thread, cur_thread,auct[0])
                         print "Sent email to buyer " + auct_winner[5]
                         print "Sent email to seller" + auct_seller
+        email_server.close()
         conn_thread.close()
-        time.sleep(random.randrange(30,60))
+        time.sleep(random.randrange(60,120))
 
 
 #------------------------------------------------APP CONFIG AND THREADING------------------------------------------------
 
 app = Flask(__name__)
-
-email_server = smtplib.SMTP("smtp.live.com", 25)
-email_server.ehlo()
-email_server.starttls()
-email_server.login("asw_leiloes@hotmail.com", "halflife2")
 
 app.config['DEBUG'] = True
 app.config['TRAP_BAD_REQUEST_ERRORS'] = True
