@@ -280,3 +280,6 @@ def set_email_sent(conn, cur, item_id):
     else:
         return False
 
+def search_articles(cur, *args):
+    for arg in args:
+        print args

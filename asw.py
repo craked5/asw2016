@@ -463,7 +463,9 @@ def editar_leilao(item_id):
 def procurar():
     if "username" in session:
         if request.method == "POST":
-            pass
+            args = request.form["search_article"].split(",")
+
+            print db_utils_flask.search_articles(g.cur, args)
 
         return render_template("search.html", session_user_name = session["username"])
 

@@ -46,14 +46,14 @@
                                 <a href={{ url_for('leiloar') }}>Leiloar Novo Artigo</a>
                             </li>
                             <li>
-                                <a href={{ url_for('leiloes') }}>Procurar</a>
+                                <a href={{ url_for('procurar') }}>Procurar</a>
                             </li>
                         {% else %}
                             <li>
                                 <a href={{ url_for('leiloes') }}>Leilões</a>
                             </li>
                             <li>
-                                <a href={{ url_for('leiloes') }}>Procurar</a>
+                                <a href={{ url_for('procurar') }}>Procurar</a>
                             </li>
                         {% endif %}
                     </ul>
@@ -109,7 +109,7 @@
                                         {% endif %}
                                         <div class="form-group">
                                             <label class="sr-only" for="form-username">Search Username</label>
-                                            <input type="text" name="username_email" placeholder="Type Username or Email..." class="form-username form-control" id="username_email">
+                                            <input type="text" name="search_article" placeholder="Meta os argumentos separados por virgula..." class="form-username form-control" id="search_article">
                                         </div>
                                         <button type="submit" class="btn">Search!</button>
                                     </form>
