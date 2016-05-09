@@ -58,17 +58,18 @@ def thread_email_sender():
         for auct in auctions:
             if datetime.datetime.today() >= auct[6]:
                 if auct[8] != None:
-                    db_utils_flask.set_email_sent(conn_thread, cur_thread, auct[0])
-                    cur_thread.execute("SELECT * FROM utilizadores where user_id = %s;", [auct[7]])
-                    auct_winner = cur_thread.fetchone()
-                    cur_thread.execute("SELECT email from utilizadores where user_id = %s;", [auct[2]])
-                    auct_seller = cur_thread.fetchone()[0]
+                    if auct[10] == 0:
+                        db_utils_flask.set_email_sent(conn_thread, cur_thread, auct[0])
+                        cur_thread.execute("SELECT * FROM utilizadores where user_id = %s;", [auct[7]])
+                        auct_winner = cur_thread.fetchone()
+                        cur_thread.execute("SELECT email from utilizadores where user_id = %s;", [auct[2]])
+                        auct_seller = cur_thread.fetchone()[0]
 
-                    if send_email_new_item(email_server, "opskinsemailsender@gmail.com", auct_seller,
-                                        auct_winner[5], auct[1], "http://163.172.132.51/leiloes/"+str(auct[0])):
-                        db_utils_flask.set_email_sent(conn_thread, cur_thread,auct[0])
-                        print "Sent email to buyer " + auct_winner[5]
-                        print "Sent email to seller" + auct_seller
+                        if send_email_new_item(email_server, "opskinsemailsender@gmail.com", auct_seller,
+                                            auct_winner[5], auct[1], "http://163.172.132.51/leiloes/"+str(auct[0])):
+                            db_utils_flask.set_email_sent(conn_thread, cur_thread,auct[0])
+                            print "Sent email to buyer " + auct_winner[5]
+                            print "Sent email to seller" + auct_seller
         email_server.close()
         conn_thread.close()
         time.sleep(random.randrange(60,120))
