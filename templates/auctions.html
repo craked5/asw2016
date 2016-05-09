@@ -33,7 +33,7 @@
         });
 
         socket.on('bid', function (msg) {
-            $('#last_bid').append($('<p>').text(msg));
+            $('#last_bid').replaceWith('<p">  Ultimo Bid - '+msg['bid']+'</p>');
         });
 
     </script>
@@ -119,12 +119,14 @@
                 <div class="col-md-6">
                     <p>Valor Base - {{ item[3] }}</p>
                 </div>
-                <div id="last_bid" class="col-md-6">
-                    {% if item[8]%}
-                        <p>Ultimo Bid - {{ item[8] }}</p>
-                    {% else %}
-                        <p>Ultimo Bid - Nenhum</p>
-                    {% endif %}
+                <div class="col-md-6">
+                    <div id="last_bid">
+                        {% if item[8]%}
+                            <p>Ultimo Bid - {{ item[8] }}</p>
+                        {% else %}
+                            <p>Ultimo Bid - Nenhum</p>
+                        {% endif %}
+                    </div>
                 </div>
                 <a href="{{ url_for("leilao", item_id = item[0]) }}" class="btn btn-info text-center">Bid Now!</a>
             </div>

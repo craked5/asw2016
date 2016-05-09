@@ -32,7 +32,7 @@
         });
 
         socket.on('bid', function (msg) {
-            $('#last_bid').append($('<p>').text(msg));
+            $('#last_bid').replaceWith('<p">  Ultimo Bid - '+msg['bid']+'</p>');
         });
 
     </script>
@@ -188,7 +188,9 @@
                     <p>Data de Fim: {{ auctions_info[item][0][6] }}</p>
                 </div>
                 <div class="col-md-6">
-                    <p>Ultimo Bid - {{ auctions_info[item][0][8] }}</p>
+                    <div id="last_bid">
+                      <p>Ultimo Bid - {{ auctions_info[item][0][8] }}</p>
+                    </div>
                 </div>
             </div>
         {% endfor %}
