@@ -39,12 +39,11 @@
         $(function () {
             $('#bid_form').submit(function (ev) {
                 socket.emit('new_bid', $('#bid_amount').val());
-                return false;
             });
         });
 
         socket.on('bid', function (msg) {
-            $('#last_bid').append($('<p>').text(msg));
+            $('#last_bid').append($('<p>').text(msg['bid']));
         });
 
     </script>

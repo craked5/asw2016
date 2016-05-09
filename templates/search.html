@@ -11,6 +11,21 @@
         <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
         <script src="{{ url_for('static', filename='js/bootstrap-formhelpers.js') }}"></script>
         <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+        <script>
+        var socket = io.connect("http://localhost:5000");
+
+        $(function () {
+            $('#bid_form').submit(function (ev) {
+                socket.emit('new_bid', $('#bid_amount').val());
+                return false;
+            });
+        });
+
+        socket.on('bid', function (msg) {
+            $('#last_bid').append($('<p>').text(msg));
+        });
+
+    </script>
 
         <!-- CSS -->
         <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto:400,100,300,500">
