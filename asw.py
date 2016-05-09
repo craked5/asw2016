@@ -1,5 +1,9 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 from flask import Flask, render_template, request, session, redirect, escape, url_for, flash, make_response, g
 from flask.ext.mysql import MySQL
+from flask.ext.socketio import SocketIO, emit
 from werkzeug.security import generate_password_hash, check_password_hash
 from bs4 import BeautifulSoup
 import db_utils_flask
@@ -47,7 +51,7 @@ def send_email_new_item(email_server, FROM, TO_seller, TO_buyer, item_name, item
 def thread_email_sender():
     print "STARTED EMAIL SENDER THREAD!"
     while True:
-        email_server = smtplib.SMTP("smtp.live.com", 25)
+        email_server = smtplib.SMTP_SSL("smtp.live.com", 25)
         email_server.ehlo()
         email_server.starttls()
         email_server.login("asw_leiloes@hotmail.com", "halflife2")
@@ -84,6 +88,7 @@ app.config['TRAP_BAD_REQUEST_ERRORS'] = True
 app.config['SESSION_PERMANENT'] = False
 app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
 mysql = MySQL()
+socket = SocketIO(app)
 
 
 # MySQL configurations
@@ -93,10 +98,10 @@ app.config['MYSQL_DATABASE_DB'] = 'asw'
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 mysql.init_app(app)
 
-thread1 = emailSender(1, "emailSenderThread", 1)
-thread1.start()
-print threading.activeCount()
-print threading.enumerate()
+#thread1 = emailSender(1, "emailSenderThread", 1)
+#thread1.start()
+#print threading.activeCount()
+#print threading.enumerate()
 
 #------------------------------------------------FLASK ROUTES------------------------------------------------
 
@@ -321,6 +326,7 @@ def leilao(item_id):
                     last_bidder = ["Anonimo"]
                 else:
                     last_bidder = [session["username"]]
+                socket.emit("bid", {'bid': bid_amount}, broadcast=True)
                 bids = db_utils_flask.get_all_bids_from_auction(g.cur, item_id)
                 res = make_response(render_template("auction.html", is_user_auction=True, session_user_name=session["username"],
                                        tags=tags, auction_info=auction, auction_owner=auction_owner,
@@ -464,16 +470,26 @@ def editar_leilao(item_id):
 def procurar():
     if "username" in session:
         if request.method == "POST":
-            args = request.form["search_article"].split(",")
+            args = request.form["search_article"]
 
-            print db_utils_flask.search_articles(g.cur, args)
+            searched_items = db_utils_flask.search_articles(g.cur, args)
+
+            if searched_items != ():
+                res = make_response(render_template("search.html", session_user_name = session["username"], search_auctions = searched_items))
+                res.headers.set('Cache-Control', 'public, max-age=0')
+                return res
+            else:
+                res = make_response(render_template("search.html", session_user_name=session["username"], error="Nao foram encontrados nenhuns leiloes com a sua pesquisa!"))
+                res.headers.set('Cache-Control', 'public, max-age=0')
+                return res
 
         return render_template("search.html", session_user_name = session["username"])
 
     return render_template("search.html")
 
 
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    socket.run(app, debug=True)
 
 

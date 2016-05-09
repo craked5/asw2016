@@ -281,5 +281,7 @@ def set_email_sent(conn, cur, item_id):
         return False
 
 def search_articles(cur, *args):
-    for arg in args:
-        print args
+    cur.execute("SELECT * FROM artigos where item_id = %s or designacao = %s or descricao = %s or data_fim = %s or data_entr = %s or valor_base = %s", [args[0], args[0],args[0],args[0],args[0],args[0]])
+    res = cur.fetchall()
+    return res
+
