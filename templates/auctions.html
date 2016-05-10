@@ -23,7 +23,7 @@
     <!-- Bootstrap Core JavaScript -->
     <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
     <script>
-        var socket = io.connect("http://163.172.132.51:80");
+        var socket = io.connect('http://' + document.domain + ':' + location.port);
 
         $(function () {
             $('#bid_form').submit(function (ev) {
