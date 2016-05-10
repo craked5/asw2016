@@ -12,6 +12,7 @@ import smtplib
 import time
 import threading
 import random
+import socket as sock
 import gevent
 
 async_mode = None
@@ -522,6 +523,8 @@ def procurar():
 
 
 if __name__ == '__main__':
-    socket.run(app, debug=True, port=80)
+    socket.run(app, debug=True, port=80, host=sock.gethostbyname(sock.gethostname()))
+
+
 
 
