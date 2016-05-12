@@ -12,39 +12,6 @@ import smtplib
 import time
 import threading
 import random
-import socket as sock
-import gevent
-
-async_mode = None
-
-if async_mode is None:
-    try:
-        import eventlet
-        async_mode = 'eventlet'
-    except ImportError:
-        pass
-
-    if async_mode is None:
-        try:
-            from gevent import monkey
-            async_mode = 'gevent'
-        except ImportError:
-            pass
-
-    if async_mode is None:
-        async_mode = 'threading'
-
-    print('async_mode is ' + async_mode)
-
-# monkey patching is necessary because this application uses a background
-# thread
-if async_mode == 'eventlet':
-    import eventlet
-    eventlet.monkey_patch()
-elif async_mode == 'gevent':
-    from gevent import monkey
-    monkey.patch_all()
-
 
 class emailSender (threading.Thread):
     def __init__(self, threadID, name, counter):
@@ -121,7 +88,7 @@ app.config['TRAP_BAD_REQUEST_ERRORS'] = True
 app.config['SESSION_PERMANENT'] = False
 app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
 mysql = MySQL()
-socket = SocketIO(app, async_mode=async_mode)
+socket = SocketIO(app, allow_upgrades=True, engineio_logger = True)
 
 
 # MySQL configurations
@@ -523,7 +490,7 @@ def procurar():
 
 
 if __name__ == '__main__':
-    socket.run(app, debug=True, port=80, host=sock.gethostbyname(sock.gethostname()))
+    socket.run(app, debug=True)
 
 
 
