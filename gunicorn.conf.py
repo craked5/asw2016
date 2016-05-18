@@ -3,7 +3,7 @@ import os
 bind = '0.0.0.0:8081'
 workers = 1
 backlog = 2048
-worker_class = "sync"
+worker_class = "eventlet"
 daemon = True
 debug = True
 proc_name = 'gunicorn.proc'
