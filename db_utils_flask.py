@@ -285,3 +285,7 @@ def search_articles(cur, *args):
     res = cur.fetchall()
     return res
 
+
+def get_highest_bid_item_id(cur, item_id):
+    cur.execute("SELECT * FROM artigos where item_id = %s", [item_id])
+    return cur.fetchall()

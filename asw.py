@@ -487,7 +487,47 @@ def procurar():
 
     return render_template("search.html")
 
+@app.route("/php/valorActualDoItem", methods=["POST"])
+def valorActualDoItem():
 
+    item_id  = request.get_data()
+
+    item = db_utils_flask.get_highest_bid_item_id(g.cur, item_id)
+
+    print item
+    if item[0][8] is None:
+        return "0"
+    else:
+        return str(item[0][8])
+
+
+@app.route("/php/licitaItem", methods=["POST"])
+def licitaItem():
+
+    stuff  = request.get_data()
+    today = datetime.datetime.today().strftime('%Y-%m-%d %H:%M:%S')
+
+    item = db_utils_flask.get_user_auction(g.cur, stuff[0])
+
+    if item[0][8] is None:
+        pass
+
+    elif item[0][6] > today:
+        return "Terminado"
+
+    elif item[0][8] < stuff[1]:
+        if item[0][3] < stuff[1]:
+            pass
+        else:
+            return "Nao Aceite"
+    else:
+        return "Nao Aceite"
+
+
+    if db_utils_flask.update_bid_amount(g.conn, g.cur, stuff[2], stuff[0], today, stuff[1], 0):
+        return "Aceite"
+    else:
+        return "Nao Aceite"
 
 if __name__ == '__main__':
     socket.run(app, debug=True)

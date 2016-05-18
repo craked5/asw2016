@@ -1,6 +1,6 @@
 import os
 
-bind = '0.0.0.0:8000'
+bind = '0.0.0.0:8081'
 workers = 1
 backlog = 2048
 worker_class = "sync"
