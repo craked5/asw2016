@@ -51,13 +51,13 @@ function licitaItem($id, $valor, $username, $password) {
 }
 
 $server = new soap_server();
-$server->configureWSDL('cumpwsdl', 'urn:cumpwsdl');
+$server->configureWSDL('items', 'http://188.166.146.154/items');
 
 $server->register("valorActualDoItem", // nome metodo
 	array('id' => 'xsd:decimal'), // input
-	array('return' => 'xsd:'), // output 
-	'uri:cumpwsdl', // namespace
-	'urn:cumpwsdl#valorActualDoItem', // SOAPAction
+	array('return' => 'xsd:string'), // output 
+	'http://188.166.146.154/items', // namespace
+	'http://188.166.146.154/items#valorActualDoItem', // SOAPAction
 	'rpc', // estilo
 	'encoded' // uso
 );
@@ -65,8 +65,8 @@ $server->register("valorActualDoItem", // nome metodo
 $server->register("licitaItem", // nome metodo
 	array('id' => 'xsd:decimal', 'valor' => 'xsd:decimal', 'username' => 'xsd:string', 'password' => 'xsd:string'), // input
 	array('return' => 'xsd:string'), // output 
-	'uri:cumpwsdl', // namespace
-	'urn:cumpwsdl#licitaItem', // SOAPAction
+	'http://188.166.146.154/items', // namespace
+	'http://188.166.146.154/items#licitaItem', // SOAPAction
 	'rpc', // estilo
 	'encoded' // uso
 );
