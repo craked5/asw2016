@@ -137,7 +137,7 @@ def make_new_auction(conn, cur, nick, nome_artigo, desc_artigo, base_value, tags
         return False
 
 def get_all_auctions(cur):
-    cur.execute("SELECT * FROM artigos")
+    cur.execute("SELECT * FROM artigos ORDER BY data_fim")
     return cur.fetchall()
 
 def get_user_nick_from_userid(cur, user_id):
@@ -289,3 +289,16 @@ def search_articles(cur, *args):
 def get_highest_bid_item_id(cur, item_id):
     cur.execute("SELECT * FROM artigos where item_id = %s", [item_id])
     return cur.fetchall()
+
+def check_user_exists(cur, username):
+    cur.execute("SELECT DISTINCT nick FROM utilizadores where nick = %s", [username])
+    users = cur.fetchall()
+    if len(users) == 0:
+        return False
+    else:
+        return True
+
+def get_user_password_with_username(cur, username):
+    id = get_user_id(cur, username)
+    cur.execute("SELECT pal_chave FROM palavraschave where item_id = %s", [id])
+    return cur.fetchone()[0]

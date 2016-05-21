@@ -33,6 +33,7 @@ def licitaItem(id, valor, username, password):
 
     print res.status_code
     print res.content
+    return res.content
 
 
 server = SimpleXMLRPCServer(("localhost", 8081))

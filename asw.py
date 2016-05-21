@@ -53,8 +53,10 @@ def leiloes():
     auctions = db_utils_flask.get_all_auctions(g.cur)
     auctions_temp = []
 
+    print db_utils_flask.get_user_password_with_username(g.cur, session["username"])
+
+
     for index, item in enumerate(auctions):
-        print datetime.datetime.today() >= item[6]
         if datetime.datetime.today() <= item[6]:
             auctions_temp.append(item)
 
@@ -260,7 +262,7 @@ def leilao(item_id):
                     last_bidder = ["Anonimo"]
                 else:
                     last_bidder = [session["username"]]
-                socket.emit("bid", {'bid': bid_amount}, broadcast=True)
+                socket.emit("bid", {'bid': bid_amount, 'id':auction[0][0]}, broadcast=True)
                 bids = db_utils_flask.get_all_bids_from_auction(g.cur, item_id)
                 res = make_response(render_template("auction.html", is_user_auction=True, session_user_name=session["username"],
                                        tags=tags, auction_info=auction, auction_owner=auction_owner,
@@ -439,31 +441,46 @@ def valorActualDoItem():
 @app.route("/php/licitaItem", methods=["POST"])
 def licitaItem():
 
-    stuff  = request.get_data()
+    stuff  = request.get_json(force=True)
     print stuff
     today = datetime.datetime.today().strftime('%Y-%m-%d %H:%M:%S')
 
-    item = db_utils_flask.get_user_auction(g.cur, stuff[0])
+    item = db_utils_flask.get_user_auction(g.cur, int(stuff["id"]))
 
-    if item[0][8] is None:
-        pass
-
-    elif item[0][6] > today:
-        return "Terminado"
-
-    elif item[0][8] < stuff[1]:
-        if item[0][3] < stuff[1]:
+    if db_utils_flask.check_user_exists(g.cur, stuff["username"]):
+        if stuff["password"] == db_utils_flask.get_user_password_with_username(g.cur, stuff['username']):
             pass
         else:
-            return "Nao Aceite"
+            return "Nao Aceite - Password para o user " + str(stuff["username"]) + ' esta errada!'
     else:
-        return "Nao Aceite"
+        return "Nao Aceite - O user " + str(stuff["username"]) + ' nao existe!'
+
+    if len(item)==0:
+        return "Nao Aceite - item nao existe!"
+
+    elif item[0][8] is None:
+        pass
+
+    elif item[0][6] < datetime.datetime.today():
+        return "Terminado"
+
+    elif int(item[0][2]) == int(db_utils_flask.get_user_id(g.cur, stuff["username"])):
+        return "Nao Aceite - Nao pode bidar nos seus leiloes!"
+
+    elif item[0][8] < stuff["valor"]:
+        if item[0][3] < stuff["valor"]:
+            pass
+        else:
+            return "Nao Aceite - bid inferior ao valor base!"
+    else:
+        return "Nao Aceite - bid inferior a ultima bid!"
 
 
-    if db_utils_flask.update_bid_amount(g.conn, g.cur, stuff[2], stuff[0], today, stuff[1], 0):
+    if db_utils_flask.update_bid_amount(g.conn, g.cur, stuff["username"], stuff["id"], today, stuff["valor"], 0):
+        socket.emit("bid", {'bid': stuff["valor"], 'id':item[0][0]}, broadcast=True)
         return "Aceite"
     else:
-        return "Nao Aceite"
+        return "Nao Aceite - erro!"
 
 if __name__ == '__main__':
     socket.run(app, debug=True)
