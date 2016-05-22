@@ -96,7 +96,7 @@
                         {% if message %}
                                 <p class=message><strong>Message:</strong> {{ message }}
                         {% endif %}
-                        <form role="form" action="" method="post" class="registration-form">
+                        <form role="form" action="" method="post" class="registration-form" enctype="multipart/form-data">
                             <div class="form-group">
                                 <label>Nome do artigo</label>
                                 <label class="sr-only" for="nome-artigo">Nome do artigo</label>
@@ -126,6 +126,10 @@
                                 <label>Data de Fim do Leilão</label>
                                 <label class="sr-only" for="data-fim">Data de Fim do Leilão YYYY-MM-DD</label>
                                 <input type="date" name="data-fim" placeholder="Data de Nascimento..." class="form form-control" id="data-fim">
+                            </div>
+                            <div class="form-group">
+                                <label class="sr-only" for="imagem">Imagem</label>
+                                <input type="file" value="file" name="imagem" class="form-control" id="imagem">
                             </div>
                             <button type="submit" class="btn btn-info">Fazer novo leilão!</button>
                         </form>

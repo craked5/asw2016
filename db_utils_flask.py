@@ -132,9 +132,9 @@ def make_new_auction(conn, cur, nick, nome_artigo, desc_artigo, base_value, tags
                          % (max_auction_id, nome_artigo, user_id, base_value, desc_artigo, initial_date, end_date, "NULL", "NULL", 0, 0)
     if cur.execute(querie_new_auction) == 1:
         conn.commit()
-        return True
+        return [True, user_id]
     else:
-        return False
+        return [False, '']
 
 def get_all_auctions(cur):
     cur.execute("SELECT * FROM artigos ORDER BY data_fim")
@@ -328,7 +328,7 @@ def get_latest_user_image_user(cur, username):
 
     cur.execute("SELECT MAX(item_id) from imagens_user where user_id = %s;", [user_id])
     max_image_id = cur.fetchone()
-    if len(max_image_id) > 0:
+    if max_image_id[0] is not None:
         cur.execute("SELECT nome_img from imagens_user where item_id = %s;", [max_image_id[0]])
         path = cur.fetchone()[0]
         return [True, path]
@@ -336,7 +336,7 @@ def get_latest_user_image_user(cur, username):
         return [False, '']
 
 def get_max_image_id_leilao(cur):
-    querie_get_max_image_id = "SELECT MAX(item_id)+1 from imagens_leilao"
+    querie_get_max_image_id = "SELECT MAX(item_id)+1 from imagens_leiloes"
     if cur.execute(querie_get_max_image_id) == 1:
         max_id = cur.fetchone()[0]
         if max_id == None:
@@ -347,7 +347,7 @@ def get_max_image_id_leilao(cur):
 def add_new_image_leilao(conn, cur, path, user_id):
 
     item_id = get_max_image_id_user(cur)
-    querie_new_image = "INSERT INTO `imagens_leilao` VALUES (%s, %s, '%s');" \
+    querie_new_image = "INSERT INTO `imagens_leiloes` VALUES (%s, %s, '%s');" \
                       % (user_id, item_id, path)
     if cur.execute(querie_new_image):
         conn.commit()
@@ -358,11 +358,20 @@ def add_new_image_leilao(conn, cur, path, user_id):
 def get_latest_user_image_leilao(cur, username):
     user_id = get_user_id(cur, username)
 
-    cur.execute("SELECT MAX(item_id) from imagens_leilao where user_id = %s;", [user_id])
+    cur.execute("SELECT MAX(item_id) from imagens_leiloes where user_id = %s;", [user_id])
     max_image_id = cur.fetchone()
     if len(max_image_id) > 0:
-        cur.execute("SELECT nome_img from imagens_leilao where item_id = %s;", [max_image_id[0]])
+        cur.execute("SELECT nome_img from imagens_leiloes where item_id = %s;", [max_image_id[0]])
         path = cur.fetchone()[0]
+        return [True, path]
+    else:
+        return [False, '']
+
+def get_leilao_image_by_id(cur, item_id):
+
+    cur.execute("SELECT nome_img from imagens_leiloes where item_id = %s;", [item_id])
+    path = cur.fetchone()
+    if path is not None:
         return [True, path]
     else:
         return [False, '']

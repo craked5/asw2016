@@ -14,9 +14,6 @@ import time
 import os
 import threading
 import random
-import sys
-reload(sys)
-sys.setdefaultencoding("utf-8")
 
 #------------------------------------------------APP CONFIG AND THREADING------------------------------------------------
 
@@ -68,7 +65,13 @@ def leiloes():
 
     for index, item in enumerate(auctions):
         if datetime.datetime.today() <= item[6]:
-            auctions_temp.append(item)
+            image_path = db_utils_flask.get_leilao_image_by_id(g.cur, item[0])
+            image_path = image_path[1],
+            item_temp = item + image_path
+            print item
+            print item_temp
+            auctions_temp.append(item_temp)
+
 
     print auctions_temp
 
@@ -328,11 +331,19 @@ def leiloar():
             info["tags"] = request.form['tags']
             info["data_inicio"] = request.form['data-inicio']
             info["data_fim"] = request.form['data-fim']
+            file = request.files['imagem']
+            filename = ''
+            if file and allowed_file(file.filename):
+                filename = secure_filename(file.filename)
+                file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
 
-            if db_utils_flask.make_new_auction(g.conn,g.cur,session["username"], info["nome_artigo"], info["descricao_artigo"],
-                                               info["valor_base"], info["tags"], info["data_inicio"], info["data_fim"]):
-                return render_template("new_auction.html", message="Leilao criado com sucesso!",
-                                       session_user_name = session["username"])
+            res = db_utils_flask.make_new_auction(g.conn,g.cur,session["username"], info["nome_artigo"], info["descricao_artigo"],
+                                               info["valor_base"], info["tags"], info["data_inicio"], info["data_fim"])
+            if res[0] is True:
+                if db_utils_flask.add_new_image_leilao(g.conn, g.cur, filename, res[1]):
+                    return render_template("auctions.html", message="Leilao criado com sucesso!",
+                                           session_user_name = session["username"])
+
 
         return render_template("new_auction.html", session_user_name = session["username"])
 
@@ -363,12 +374,21 @@ def perfil():
                 aucts_dict_participate_end[auctions_dict_participate[0]] = aucts
                 #last_bidders_ended[auctions_dict_participate[0]] = last_bidders[auctions_dict_participate[0]]
 
-        res = make_response(render_template("profile.html", session_user_name=session["username"], user_info=user_info,
-                               auctions_info=auctions_dict, tags_info=tags_dict , datetime = datetime.datetime.today(),
+        if filename[0] is True:
+            res = make_response(render_template("profile.html", session_user_name=session["username"], user_info=user_info,
+                                   auctions_info=auctions_dict, tags_info=tags_dict , datetime = datetime.datetime.today(),
+                                    bid_auctions_ended=aucts_dict_participate_end, bid_auctions=auctions_dict_participate,
+                                    last_bidders=last_bidders, user_image_file=filename[1]))
+            res.headers.set('Cache-Control', 'public, max-age=0')
+            return res
+        else:
+            res = make_response(
+                render_template("profile.html", session_user_name=session["username"], user_info=user_info,
+                                auctions_info=auctions_dict, tags_info=tags_dict, datetime=datetime.datetime.today(),
                                 bid_auctions_ended=aucts_dict_participate_end, bid_auctions=auctions_dict_participate,
-                                last_bidders=last_bidders, user_image=filename[1]))
-        res.headers.set('Cache-Control', 'public, max-age=0')
-        return res
+                                last_bidders=last_bidders))
+            res.headers.set('Cache-Control', 'public, max-age=0')
+            return res
 
 @app.route("/editar_leilao/<item_id>", methods=["GET", "POST"])
 def editar_leilao(item_id):

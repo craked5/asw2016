@@ -105,7 +105,11 @@
         {% for item in auctions %}
             <div id="{{ item[0] }}" class="col-xs-6 col-sm-4 portfolio-item">
                 <a href="{{ url_for("leilao", item_id = item[0]) }}">
-                    <img class="img-responsive" src="http://www.verdisreviews.com/wp-content/uploads/2015/08/usat-2012-auction.jpg" alt="" title="" style="">
+                    {% if item[11] != '' %}
+                        <img class="img-responsive" src="{{ url_for('static', filename="imagensLeiloes/"+item[11]) }}" alt="" title="" style="">
+                    {% else %}
+                        <img class="img-responsive" src="http://www.verdisreviews.com/wp-content/uploads/2015/08/usat-2012-auction.jpg" alt="" title="" style="">
+                    {% endif %}
                 </a>
                 <h3>
                     <a href="{{ url_for("leilao", item_id = item[0]) }}">{{ item[1] }}</a>
