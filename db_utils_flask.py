@@ -46,9 +46,9 @@ def register(conn, cur, username, email, password, first_name, last_name, gender
                                     country, conselho, district, birth_date)
             if cur.execute(querie_regist_user) == 1:
                 conn.commit()
-                return True
+                return [True, max_id]
     else:
-        return "This nick already exists. Please login."
+        return [False, "O username ja existe! Por favor faca login!"]
 
 def search_user(cur, nick_email):
 
@@ -302,3 +302,67 @@ def get_user_password_with_username(cur, username):
     id = get_user_id(cur, username)
     cur.execute("SELECT pal_chave FROM palavraschave where item_id = %s", [id])
     return cur.fetchone()[0]
+
+def get_max_image_id_user(cur):
+    querie_get_max_image_id = "SELECT MAX(item_id)+1 from imagens_user"
+    if cur.execute(querie_get_max_image_id) == 1:
+        max_id = cur.fetchone()[0]
+        if max_id == None:
+            max_id = 1
+            return max_id - 1
+        return max_id - 1
+
+def add_new_image_user(conn, cur, path, user_id):
+
+    item_id = get_max_image_id_user(cur)
+    querie_new_image = "INSERT INTO `imagens_user` VALUES (%s, %s, '%s');" \
+                      % (user_id, item_id, path)
+    if cur.execute(querie_new_image):
+        conn.commit()
+        return True
+    else:
+        return False
+
+def get_latest_user_image_user(cur, username):
+    user_id = get_user_id(cur, username)
+
+    cur.execute("SELECT MAX(item_id) from imagens_user where user_id = %s;", [user_id])
+    max_image_id = cur.fetchone()
+    if len(max_image_id) > 0:
+        cur.execute("SELECT nome_img from imagens_user where item_id = %s;", [max_image_id[0]])
+        path = cur.fetchone()[0]
+        return [True, path]
+    else:
+        return [False, '']
+
+def get_max_image_id_leilao(cur):
+    querie_get_max_image_id = "SELECT MAX(item_id)+1 from imagens_leilao"
+    if cur.execute(querie_get_max_image_id) == 1:
+        max_id = cur.fetchone()[0]
+        if max_id == None:
+            max_id = 1
+            return max_id - 1
+        return max_id - 1
+
+def add_new_image_leilao(conn, cur, path, user_id):
+
+    item_id = get_max_image_id_user(cur)
+    querie_new_image = "INSERT INTO `imagens_leilao` VALUES (%s, %s, '%s');" \
+                      % (user_id, item_id, path)
+    if cur.execute(querie_new_image):
+        conn.commit()
+        return True
+    else:
+        return False
+
+def get_latest_user_image_leilao(cur, username):
+    user_id = get_user_id(cur, username)
+
+    cur.execute("SELECT MAX(item_id) from imagens_leilao where user_id = %s;", [user_id])
+    max_image_id = cur.fetchone()
+    if len(max_image_id) > 0:
+        cur.execute("SELECT nome_img from imagens_leilao where item_id = %s;", [max_image_id[0]])
+        path = cur.fetchone()[0]
+        return [True, path]
+    else:
+        return [False, '']

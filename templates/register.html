@@ -77,7 +77,7 @@
                                     {% if message %}
                                             <p class=message><strong>Mensagem:</strong> {{ message }}
                                     {% endif %}
-				                    <form role="form" action="" method="post" class="registration-form">
+				                    <form role="form" action="" method="post" class="registration-form" enctype=multipart/form-data>
 				                    	<div class="form-group">
 				                    		<label class="sr-only" for="form-first-name">Primeiro Nome</label>
 				                        	<input type="text" name="first-name" placeholder="First name..." class="form-first-name form-control" id="first-name">
@@ -117,7 +117,11 @@
 				                    		<label class="sr-only" for="conselho">Conselho</label>
 				                        	<input type="text" name="conselho" placeholder="Conselho..." class="form-control" id="conselho">
 				                        </div>
-				                        <button type="submit" class="btn">Registo!</button>
+                                        <div class="form-group">
+				                    		<label class="sr-only" for="imagem">Imagem</label>
+				                        	<input type="file" value="file" name="imagem" class="form-control" id="imagem">
+				                        </div>
+				                        <button type="submit" value="upload" class="btn">Registo!</button>
 				                    </form>
 			                    </div>
                         	</div>

@@ -1,25 +1,34 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from flask import Flask, render_template, request, session, redirect, escape, url_for, flash, make_response, g
+from flask import Flask, render_template, request, session, redirect, escape, url_for, \
+    flash, make_response, g, send_from_directory
 from flask.ext.mysql import MySQL
 from flask.ext.socketio import SocketIO, emit
-from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.utils import secure_filename
 from bs4 import BeautifulSoup
 import db_utils_flask
 import datetime
 import smtplib
 import time
+import os
 import threading
 import random
+import sys
+reload(sys)
+sys.setdefaultencoding("utf-8")
 
 #------------------------------------------------APP CONFIG AND THREADING------------------------------------------------
+
+UPLOAD_FOLDER = 'static/imagens'
+ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
 
 app = Flask(__name__)
 
 app.config['DEBUG'] = True
 app.config['TRAP_BAD_REQUEST_ERRORS'] = True
 app.config['SESSION_PERMANENT'] = False
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
 mysql = MySQL()
 socket = SocketIO(app, allow_upgrades=True, engineio_logger = True)
@@ -39,6 +48,10 @@ mysql.init_app(app)
 
 #------------------------------------------------FLASK ROUTES------------------------------------------------
 
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
+
 @app.before_request
 def before_request_callbacks():
     g.conn = mysql.connect()
@@ -52,9 +65,6 @@ def close_db(*args):
 def leiloes():
     auctions = db_utils_flask.get_all_auctions(g.cur)
     auctions_temp = []
-
-    print db_utils_flask.get_user_password_with_username(g.cur, session["username"])
-
 
     for index, item in enumerate(auctions):
         if datetime.datetime.today() <= item[6]:
@@ -119,16 +129,29 @@ def registo():
         info["birth_date"] = request.form['birth-date']
         info["district"] = request.form['district']
         info["conselho"] = request.form['conselho']
+        file = request.files['imagem']
+        filename = ''
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
 
         for key in info:
             if bool(BeautifulSoup(info[key], "html.parser").find()):
                 error = "HTML detetado em " + str(key)
                 return render_template('register.html', error=error)
 
-        if db_utils_flask.register(g.conn, g.cur, info["username"], info["email"], info["password"], info["first_name"],
+        res = db_utils_flask.register(g.conn, g.cur, info["username"], info["email"], info["password"], info["first_name"],
                                 info["last_name"], info["gender"], info["country"],
-                                info["birth_date"], info["conselho"], info["district"]) == True:
-            return render_template("auctions.html", message="Regist was done good, please login!")
+                                info["birth_date"], info["conselho"], info["district"])
+        if res[0] is True:
+            if db_utils_flask.add_new_image_user(g.conn, g.cur, filename, res[1]):
+                return render_template("auctions.html", message="O seu registo foi efectuado com sucesso! Faca login para bidar!")
+            else:
+                return render_template("register.html",
+                                       error="Erro ao efetuar o seu registo!")
+        else:
+            return render_template("register.html",
+                                   error=res[1])
 
     return render_template('register.html', error=error)
 
@@ -324,9 +347,8 @@ def perfil():
         auctions_dict = {}
         tags_dict = {}
         user_info = db_utils_flask.get_user_info(g.cur, session["username"])
-
+        filename = db_utils_flask.get_latest_user_image_user(g.cur, session["username"])
         user_number_auctions = db_utils_flask.get_user_auctions_number(g.cur, session["username"])
-
         for auction_number in user_number_auctions:
             print auction_number[0]
             auctions_dict[str(auction_number[0])] = db_utils_flask.get_user_auction(g.cur, auction_number[0])
@@ -344,7 +366,7 @@ def perfil():
         res = make_response(render_template("profile.html", session_user_name=session["username"], user_info=user_info,
                                auctions_info=auctions_dict, tags_info=tags_dict , datetime = datetime.datetime.today(),
                                 bid_auctions_ended=aucts_dict_participate_end, bid_auctions=auctions_dict_participate,
-                                last_bidders=last_bidders))
+                                last_bidders=last_bidders, user_image=filename[1]))
         res.headers.set('Cache-Control', 'public, max-age=0')
         return res
 
