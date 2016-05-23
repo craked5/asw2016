@@ -350,7 +350,7 @@ def leiloar():
             filename = ''
             if file and allowed_file(file.filename):
                 filename = secure_filename(file.filename)
-                file.save(os.path.join("UPLOAD_FOLDER", filename))
+                file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
 
             res = db_utils_flask.make_new_auction(g.conn,g.cur,session["username"], info["nome_artigo"], info["descricao_artigo"],
                                                info["valor_base"], info["tags"], info["data_inicio"], info["data_fim"])
