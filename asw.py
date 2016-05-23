@@ -144,7 +144,7 @@ def registo():
         res = db_utils_flask.register(g.conn, g.cur, info["username"], info["email"], info["password"], info["first_name"],
                                 info["last_name"], info["gender"], info["country"],
                                 info["birth_date"], info["conselho"], info["district"])
-        if res[0] is True:
+        if res[0] is True and filename != '':
             if db_utils_flask.add_new_image_user(g.conn, g.cur, filename, res[1]):
                 return render_template("auctions.html", message="O seu registo foi efectuado com sucesso! Faca login para bidar!")
             else:
@@ -354,7 +354,7 @@ def leiloar():
 
             res = db_utils_flask.make_new_auction(g.conn,g.cur,session["username"], info["nome_artigo"], info["descricao_artigo"],
                                                info["valor_base"], info["tags"], info["data_inicio"], info["data_fim"])
-            if res[0] is True:
+            if res[0] is True and filename != '':
                 if db_utils_flask.add_new_image_leilao(g.conn, g.cur, res[2], res[1], filename):
                     return render_template("auctions.html", message="Leilao criado com sucesso!",
                                            session_user_name = session["username"])
