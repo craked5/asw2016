@@ -132,7 +132,7 @@ def make_new_auction(conn, cur, nick, nome_artigo, desc_artigo, base_value, tags
                          % (max_auction_id, nome_artigo, user_id, base_value, desc_artigo, initial_date, end_date, "NULL", "NULL", 0, 0)
     if cur.execute(querie_new_auction) == 1:
         conn.commit()
-        return [True, user_id]
+        return [True, max_auction_id, user_id]
     else:
         return [False, '']
 
@@ -344,9 +344,8 @@ def get_max_image_id_leilao(cur):
             return max_id - 1
         return max_id - 1
 
-def add_new_image_leilao(conn, cur, path, user_id):
+def add_new_image_leilao(conn, cur, path, user_id, item_id):
 
-    item_id = get_max_image_id_user(cur)
     querie_new_image = "INSERT INTO `imagens_leiloes` VALUES (%s, %s, '%s');" \
                       % (user_id, item_id, path)
     if cur.execute(querie_new_image):

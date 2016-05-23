@@ -355,7 +355,7 @@ def leiloar():
             res = db_utils_flask.make_new_auction(g.conn,g.cur,session["username"], info["nome_artigo"], info["descricao_artigo"],
                                                info["valor_base"], info["tags"], info["data_inicio"], info["data_fim"])
             if res[0] is True:
-                if db_utils_flask.add_new_image_leilao(g.conn, g.cur, filename, res[1]):
+                if db_utils_flask.add_new_image_leilao(g.conn, g.cur, filename, res[1], res[2]):
                     return render_template("auctions.html", message="Leilao criado com sucesso!",
                                            session_user_name = session["username"])
 
