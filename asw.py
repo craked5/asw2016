@@ -18,7 +18,7 @@ import random
 #------------------------------------------------APP CONFIG AND THREADING------------------------------------------------
 
 UPLOAD_FOLDER = 'static/imagens'
-ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
+ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 
 app = Flask(__name__)
 
@@ -68,8 +68,6 @@ def leiloes():
             image_path = db_utils_flask.get_leilao_image_by_id(g.cur, item[0])
             image_path = image_path[1],
             item_temp = item + image_path
-            print item
-            print item_temp
             auctions_temp.append(item_temp)
 
 
@@ -224,6 +222,8 @@ def leilao(item_id):
     auction_owner = db_utils_flask.get_user_nick_from_userid(g.cur, auction[0][2])
     tags = db_utils_flask.get_auction_tags(g.cur, item_id)
     bids = db_utils_flask.get_all_bids_from_auction(g.cur, item_id)
+    filename = db_utils_flask.get_leilao_image_by_id(g.cur, auction[0][0])
+
 
     if auction[0][9] == 1:
         last_bidder = ["Anonimo"]
@@ -241,13 +241,15 @@ def leilao(item_id):
             if datetime.datetime.today() > auction[0][6]:
                 res = make_response(render_template("auction.html", session_user_name=session["username"], is_user_auction=False,
                                        tags=tags, auction_info=auction, auction_owner=auction_owner, licitacoes=bids,
-                                       error="Este leilao ja acabou!", last_bidder = last_bidder[0]))
+                                       error="Este leilao ja acabou!", last_bidder = last_bidder[0],
+                                                    leilao_image=filename))
                 res.headers.set('Cache-Control', 'public, max-age=0')
                 return res
             elif datetime.datetime.today() < auction[0][5]:
                 res =  make_response(render_template("auction.html", session_user_name=session["username"], is_user_auction=False,
                                        tags=tags, auction_info=auction, auction_owner=auction_owner, licitacoes=bids,
-                                       error="Este leilao ainda nao comecou!", last_bidder=last_bidder[0]))
+                                       error="Este leilao ainda nao comecou!", last_bidder=last_bidder[0],
+                                                     leilao_image=filename))
                 res.headers.set('Cache-Control', 'public, max-age=0')
                 return res
 
@@ -263,7 +265,8 @@ def leilao(item_id):
                 if float(bid_amount) <= float(auction[0][8]):
                     res = make_response(render_template("auction.html", is_user_auction=True, session_user_name=session["username"],
                                            tags=tags, auction_info=auction, auction_owner=auction_owner, licitacoes=bids,
-                                           error="O valor da sua bid foi menor que o ultimo bid existente!", last_bidder=last_bidder[0]))
+                                           error="O valor da sua bid foi menor que o ultimo bid existente!", last_bidder=last_bidder[0],
+                                                        leilao_image=filename))
                     res.headers.set('Cache-Control', 'public, max-age=0')
                     return res
 
@@ -271,7 +274,7 @@ def leilao(item_id):
                 res = make_response(render_template("auction.html", is_user_auction=True, session_user_name=session["username"],
                                        tags=tags, auction_info=auction, auction_owner=auction_owner, licitacoes=bids,
                                        error="O valor da sua bid foi menor que o valor base!",
-                                       last_bidder=last_bidder[0]))
+                                       last_bidder=last_bidder[0], leilao_image=filename))
                 res.headers.set('Cache-Control', 'public, max-age=0')
                 return res
 
@@ -279,7 +282,7 @@ def leilao(item_id):
                 res = make_response(render_template("auction.html", is_user_auction=True, session_user_name=session["username"],
                                        tags=tags, auction_info=auction, auction_owner=auction_owner, licitacoes=bids,
                                        error="Nao pode fazer bids nos seus leiloes!",
-                                       last_bidder=last_bidder[0]))
+                                       last_bidder=last_bidder[0], leilao_image=filename))
                 res.headers.set('Cache-Control', 'public, max-age=0')
                 return res
 
@@ -293,31 +296,43 @@ def leilao(item_id):
                 res = make_response(render_template("auction.html", is_user_auction=True, session_user_name=session["username"],
                                        tags=tags, auction_info=auction, auction_owner=auction_owner,
                                        message="A sua bid foi aceite!", last_bidder = last_bidder[0],
-                                                    new_bid = bid_amount, licitacoes=bids))
+                                                    new_bid = bid_amount, licitacoes=bids, leilao_image=filename))
                 res.headers.set('Cache-Control', 'public, max-age=0')
                 return res
             else:
                 res = make_response(render_template("auction.html", is_user_auction=True, session_user_name=session["username"],
                                        tags=tags, auction_info=auction, auction_owner=auction_owner, licitacoes=bids,
-                                       error="Ocurreu um error a fazer a sua bid", last_bidder = last_bidder[0]))
+                                       error="Ocurreu um error a fazer a sua bid", last_bidder = last_bidder[0],
+                                                    leilao_image=filename))
                 res.headers.set('Cache-Control', 'public, max-age=0')
                 return res
         else:
             res = make_response(
                 render_template("auction.html", is_user_auction=True,
                                 tags=tags, auction_info=auction, auction_owner=auction_owner, licitacoes=bids,
-                                error="Tem de fazer o Login para poder biddar!", last_bidder=last_bidder[0]))
+                                error="Tem de fazer o Login para poder biddar!", last_bidder=last_bidder[0],
+                                leilao_image=filename))
             res.headers.set('Cache-Control', 'public, max-age=0')
             return res
     if session.has_key("username"):
         sess_user = session["username"]
     else:
         sess_user = ""
-    res = make_response(
-        render_template("auction.html", session_user_name=sess_user, is_user_auction=False, licitacoes=bids,
-                        tags=tags, auction_info=auction, auction_owner=auction_owner, last_bidder=last_bidder[0]))
-    res.headers.set('Cache-Control', 'public, max-age=0')
-    return res
+
+    if filename[0] is True:
+        res = make_response(
+            render_template("auction.html", session_user_name=sess_user, is_user_auction=False, licitacoes=bids,
+                            tags=tags, auction_info=auction, auction_owner=auction_owner, last_bidder=last_bidder[0],
+                            leilao_image=filename))
+        res.headers.set('Cache-Control', 'public, max-age=0')
+        return res
+    else:
+        res = make_response(
+            render_template("auction.html", session_user_name=sess_user, is_user_auction=False, licitacoes=bids,
+                            tags=tags, auction_info=auction, auction_owner=auction_owner, last_bidder=last_bidder[0],
+                            leilao_image=filename))
+        res.headers.set('Cache-Control', 'public, max-age=0')
+        return res
 
 @app.route("/leiloar", methods=["GET", "POST"])
 def leiloar():
@@ -335,7 +350,7 @@ def leiloar():
             filename = ''
             if file and allowed_file(file.filename):
                 filename = secure_filename(file.filename)
-                file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                file.save(os.path.join("UPLOAD_FOLDER", filename))
 
             res = db_utils_flask.make_new_auction(g.conn,g.cur,session["username"], info["nome_artigo"], info["descricao_artigo"],
                                                info["valor_base"], info["tags"], info["data_inicio"], info["data_fim"])
@@ -361,23 +376,39 @@ def perfil():
         filename = db_utils_flask.get_latest_user_image_user(g.cur, session["username"])
         user_number_auctions = db_utils_flask.get_user_auctions_number(g.cur, session["username"])
         for auction_number in user_number_auctions:
-            print auction_number[0]
-            auctions_dict[str(auction_number[0])] = db_utils_flask.get_user_auction(g.cur, auction_number[0])
+
+            auct =  db_utils_flask.get_user_auction(g.cur, auction_number[0])
+            image_path = db_utils_flask.get_leilao_image_by_id(g.cur, auction_number[0])
+            image_path = image_path[1],
+            auct_temp = auct[0] + image_path
+            auctions_dict[str(auction_number[0])] = auct_temp
             tags_dict[str(auction_number[0])] = db_utils_flask.get_auction_tags(g.cur, auction_number[0])
 
         auctions_dict_participate, last_bidders = db_utils_flask.get_auctions_participate(g.cur, session["username"])
 
         #last_bidders_ended = {}
         aucts_dict_participate_end = {}
+        auctions_dict_participate_final = {}
         for aucts in auctions_dict_participate:
+
+            image_path = db_utils_flask.get_leilao_image_by_id(g.cur, auctions_dict_participate[aucts][0])
+            image_path = image_path[1],
+            auct_temp = auctions_dict_participate[aucts] + image_path
+            auctions_dict_participate_final[aucts] = auct_temp
+
             if auctions_dict_participate[aucts][6] <= datetime.datetime.today():
-                aucts_dict_participate_end[auctions_dict_participate[0]] = aucts
+                image_path = db_utils_flask.get_leilao_image_by_id(g.cur, auctions_dict_participate[aucts][0])
+                image_path = image_path[1],
+                auct_temp_end = auctions_dict_participate[aucts] + image_path
+                aucts_dict_participate_end[auctions_dict_participate[0]] = auct_temp_end
                 #last_bidders_ended[auctions_dict_participate[0]] = last_bidders[auctions_dict_participate[0]]
+
+        print auctions_dict_participate_final
 
         if filename[0] is True:
             res = make_response(render_template("profile.html", session_user_name=session["username"], user_info=user_info,
                                    auctions_info=auctions_dict, tags_info=tags_dict , datetime = datetime.datetime.today(),
-                                    bid_auctions_ended=aucts_dict_participate_end, bid_auctions=auctions_dict_participate,
+                                    bid_auctions_ended=aucts_dict_participate_end, bid_auctions=auctions_dict_participate_final,
                                     last_bidders=last_bidders, user_image_file=filename[1]))
             res.headers.set('Cache-Control', 'public, max-age=0')
             return res
@@ -385,7 +416,7 @@ def perfil():
             res = make_response(
                 render_template("profile.html", session_user_name=session["username"], user_info=user_info,
                                 auctions_info=auctions_dict, tags_info=tags_dict, datetime=datetime.datetime.today(),
-                                bid_auctions_ended=aucts_dict_participate_end, bid_auctions=auctions_dict_participate,
+                                bid_auctions_ended=aucts_dict_participate_end, bid_auctions=auctions_dict_participate_final,
                                 last_bidders=last_bidders))
             res.headers.set('Cache-Control', 'public, max-age=0')
             return res

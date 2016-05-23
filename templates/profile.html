@@ -164,38 +164,42 @@
         {% for item in auctions_info %}
             <div class="col-xs-6 col-sm-4 portfolio-item">
                 <a href="#">
-                    <img class="img-responsive" src="http://www.verdisreviews.com/wp-content/uploads/2015/08/usat-2012-auction.jpg" alt="" title="" style="">
+                    {% if auctions_info[item][11] != '' %}
+                        <img class="img-responsive" src="{{ url_for('static', filename="imagensLeiloes/"+auctions_info[item][11]) }}" alt="" title="" style="">
+                    {% else %}
+                        <img class="img-responsive" src="http://www.verdisreviews.com/wp-content/uploads/2015/08/usat-2012-auction.jpg" alt="" title="" style="">
+                    {% endif %}
                 </a>
                 <div class="col-md-6">
                 <h3>
-                    <a href="{{ url_for("leilao", item_id = auctions_info[item][0][0]) }}">{{auctions_info[item][0][1]}}</a>
+                    <a href="{{ url_for("leilao", item_id = auctions_info[item][0]) }}">{{auctions_info[item][0][1]}}</a>
                 </h3>
                 </div>
                 <div class="col-md-6">
-                    {% if datetime >= auctions_info[item][0][5] %}
+                    {% if datetime >= auctions_info[item][5] %}
                         <div class="alert alert-danger" role="alert">
                             Nao e possivel editar o leilao porque este ja comecou!
                         </div>
                     {% else %}
-                        <a href="{{ url_for("editar_leilao", item_id = auctions_info[item][0][0]) }}"
+                        <a href="{{ url_for("editar_leilao", item_id = auctions_info[item][0]) }}"
                            type="button" class="btn btn-info text-center">Alterar Info!</a>
                     {% endif %}
-                    <a href="{{ url_for("leilao", item_id = auctions_info[item][0][0]) }}"
+                    <a href="{{ url_for("leilao", item_id = auctions_info[item][0]) }}"
                                type="button" class="btn btn-info text-center">Ver Leilao!</a>
                 </div>
                 <div class="col-md-6">
-                    <p>Data de Inicio: {{ auctions_info[item][0][5] }}</p>
+                    <p>Data de Inicio: {{ auctions_info[item][5] }}</p>
                 </div>
                 <br>
                 <div class="col-md-6">
-                    <p>Valor Base - {{ auctions_info[item][0][3] }}</p>
+                    <p>Valor Base - {{ auctions_info[item][3] }}</p>
                 </div>
                 <div class="col-md-6">
-                    <p>Data de Fim: {{ auctions_info[item][0][6] }}</p>
+                    <p>Data de Fim: {{ auctions_info[item][6] }}</p>
                 </div>
                 <div class="col-md-6">
                     <div id="last_bid">
-                      <p>Ultimo Bid - {{ auctions_info[item][0][8] }}</p>
+                      <p>Ultimo Bid - {{ auctions_info[item][8] }}</p>
                     </div>
                 </div>
             </div>
@@ -208,7 +212,11 @@
         {% for bid_item in bid_auctions %}
             <div class="col-xs-6 col-sm-4 portfolio-item">
                 <a href="#">
-                    <img class="img-responsive" src="http://www.verdisreviews.com/wp-content/uploads/2015/08/usat-2012-auction.jpg" alt="" title="" style="">
+                    {% if bid_auctions[bid_item][11] != '' %}
+                        <img class="img-responsive" src="{{ url_for('static', filename="imagensLeiloes/"+bid_auctions[bid_item][11]) }}" alt="" title="" style="">
+                    {% else %}
+                        <img class="img-responsive" src="http://www.verdisreviews.com/wp-content/uploads/2015/08/usat-2012-auction.jpg" alt="" title="" style="">
+                    {% endif %}
                 </a>
                 <div class="col-md-6">
                 <h3>
@@ -242,7 +250,11 @@
         {% for bid_item_end in bid_auctions_ended %}
             <div class="col-xs-6 col-sm-4 portfolio-item">
                 <a href="#">
-                    <img class="img-responsive" src="http://www.verdisreviews.com/wp-content/uploads/2015/08/usat-2012-auction.jpg" alt="" title="" style="">
+                    {% if bid_auctions_ended[bid_item_end][11] != '' %}
+                        <img class="img-responsive" src="{{ url_for('static', filename="imagensLeiloes/"+bid_auctions_ended[bid_item_end][11]) }}" alt="" title="" style="">
+                    {% else %}
+                        <img class="img-responsive" src="http://www.verdisreviews.com/wp-content/uploads/2015/08/usat-2012-auction.jpg" alt="" title="" style="">
+                    {% endif %}
                 </a>
                 <div class="col-md-6">
                 <h3>
