@@ -344,7 +344,7 @@ def get_max_image_id_leilao(cur):
             return max_id - 1
         return max_id - 1
 
-def add_new_image_leilao(conn, cur, path, user_id, item_id):
+def add_new_image_leilao(conn, cur, user_id, item_id, path):
 
     querie_new_image = "INSERT INTO `imagens_leiloes` VALUES (%s, %s, '%s');" \
                       % (user_id, item_id, path)
