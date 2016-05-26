@@ -1,6 +1,6 @@
 import xmlrpclib
 
-proxy = xmlrpclib.ServerProxy("http://178.62.78.6:80/")
+proxy = xmlrpclib.ServerProxy("http://46.101.66.111:8888/")
 
 def valorAtual(n):
     return str(proxy.valorAtualDoItem(n))

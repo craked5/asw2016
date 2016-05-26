@@ -103,7 +103,7 @@
         <!-- /.row -->
         <!-- Projects Row -->
         {% for item in auctions %}
-            <div id="{{ item[0] }}" class="col-xs-6 col-sm-4 portfolio-item">
+            <div id="{{ item[0] }}" class="col-xs-6 col-sm-4 portfolio-item" style="max-width: 33%">
                 <a href="{{ url_for("leilao", item_id = item[0]) }}">
                     {% if item[11] != '' %}
                         <img class="img-responsive" src="{{ url_for('static', filename="imagens/"+item[11][0]) }}" alt="" title="" style="">
