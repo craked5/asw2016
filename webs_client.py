@@ -1,7 +1,6 @@
 import xmlrpclib
 
-proxy = xmlrpclib.ServerProxy("http://163.172.132.51:8888/")
-proxy
+proxy = xmlrpclib.ServerProxy("http://178.62.78.6:80/")
 
 def valorAtual(n):
     return str(proxy.valorAtualDoItem(n))
@@ -16,7 +15,7 @@ while True:
     if n == 'exit':
         break
 
-    elif n == "valor":
+    elif n == "valorItem":
         id = raw_input("Insira o id do leilao: ")
         try:
             print valorAtual(int(id))

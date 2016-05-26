@@ -35,7 +35,7 @@ def licitaItem(id, valor, username, password):
     return res.content
 
 
-server = SimpleXMLRPCServer(("localhost", 80))
+server = SimpleXMLRPCServer(("0.0.0.0", 80))
 print "A escuta no porto 8888..."
 server.register_function(valorAtualDoItem, "valorAtualDoItem")
 server.register_function(licitaItem, "licitaItem")
