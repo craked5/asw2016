@@ -4,7 +4,7 @@ import json
 
 def valorAtualDoItem(id):
 
-    url = 'http://localhost:5000/php/valorActualDoItem'
+    url = 'http://163.172.132.51/php/valorActualDoItem'
 
     data = {
         "id":id
@@ -19,7 +19,7 @@ def valorAtualDoItem(id):
 
 def licitaItem(id, valor, username, password):
 
-    url = 'http://localhost:5000/php/licitaItem'
+    url = 'http://163.172.132.51/php/licitaItem'
 
     data = {
         "id":id,
@@ -35,7 +35,7 @@ def licitaItem(id, valor, username, password):
     return res.content
 
 
-server = SimpleXMLRPCServer(("localhost", 8081))
+server = SimpleXMLRPCServer(("localhost", 80))
 print "A escuta no porto 8888..."
 server.register_function(valorAtualDoItem, "valorAtualDoItem")
 server.register_function(licitaItem, "licitaItem")
