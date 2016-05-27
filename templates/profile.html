@@ -157,7 +157,7 @@
             </div>
         </div>
     </div>
-    <div class="row">
+    <div class="row" style="border-bottom: 1px solid #bce8f1; padding-bottom: 8px;  margin-bottom: 20px; ">
         <h3 style="text-align: center;">
             <a>Os Meus Leiloes!</a>
         </h3>
@@ -205,7 +205,7 @@
             </div>
         {% endfor %}
     </div>
-    <div class="row">
+    <div class="row" style="border-bottom: 1px solid #bce8f1; padding-bottom: 8px;  margin-bottom: 20px; ">
         <h3 style="text-align: center; padding-top: 10px;">
             <a>Os Leiloes em que estou a participar!</a>
         </h3>
@@ -243,7 +243,7 @@
             </div>
         {% endfor %}
     </div>
-    <div class="row">
+    <div class="row" style="border-bottom: 1px solid #bce8f1; padding-bottom: 8px;  margin-bottom: 20px; ">
         <h3 style="text-align: center; padding-top: 10px;">
             <a>Leiloes que acabaram e participei!</a>
         </h3>
@@ -251,7 +251,7 @@
             <div class="col-xs-6 col-sm-4 portfolio-item">
                 <a href="#">
                     {% if bid_auctions_ended[bid_item_end][11] != '' %}
-                        <img class="img-responsive" src="{{ url_for('static', filename="imagens/"+bid_auctions_ended[bid_item_end][11][0]) }}" alt="" title="" style="">
+                        <img class="img-responsive" src="{{ url_for('static', filename="imagens/"+bid_auctions_ended[bid_item_end][11][0]) }}" alt="" title="" style="height: 350px;">
                     {% else %}
                         <img class="img-responsive" src="http://www.verdisreviews.com/wp-content/uploads/2015/08/usat-2012-auction.jpg" alt="" title="" style="">
                     {% endif %}
