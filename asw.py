@@ -403,7 +403,7 @@ def perfil():
                 print auct_temp_end
                 print auctions_dict_participate
                 aucts_dict_participate_end[auctions_dict_participate[aucts][0]] = auct_temp_end
-                print last_bidders[auctions_dict_participate[aucts][0]]
+                print last_bidders
                 last_bidders_ended[auctions_dict_participate[aucts][0]] = last_bidders[auctions_dict_participate[aucts][0]]
 
         print last_bidders_ended

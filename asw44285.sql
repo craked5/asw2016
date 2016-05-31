@@ -170,6 +170,6 @@ INSERT INTO `utilizadores` VALUES (1, 1, 'admin', 'Nuno', 'Silva', 'nunomipsilva
 INSERT INTO `utilizadores` VALUES (2, 1, 'craked5', 'Nuno', 'Silva', 'craked5@gmail.com', 'PT', 'LISBOA', 'LISBOA', null, null);
 INSERT INTO `palavraschave` VALUES (1, 'admin');
 INSERT INTO `palavraschave` VALUES (2, 'halflife2');
-INSERT INTO `artigos` VALUES (1, 'stuff1', 1, 100, 'stuff1', '2016-04-28 00:00:00', '2016-05-28 00:00:00', null, null, 0, 0);
-INSERT INTO `artigos` VALUES (2, 'stuff2', 2, 200, 'stuff2', '2016-04-29 00:00:00', '2016-05-28 00:00:00', null, null, 0, 0);
-INSERT INTO `artigos` VALUES (3, 'stuff2', 2, 200, 'stuffTemp', '2016-05-04 00:00:00', '2016-05-05 00:00:00', null, null, 0, 0);
+INSERT INTO `artigos` VALUES (1, 'stuff1', 1, 100, 'stuff1', '2016-04-28 00:00:00', '2016-06-28 00:00:00', null, null, 0, 0);
+INSERT INTO `artigos` VALUES (2, 'stuff2', 2, 200, 'stuff2', '2016-04-29 00:00:00', '2016-06-28 00:00:00', null, null, 0, 0);
+INSERT INTO `artigos` VALUES (3, 'stuff2', 2, 200, 'stuffTemp', '2016-05-04 00:00:00', '2016-05-28 00:00:00', 1, 300, 0, 0);
