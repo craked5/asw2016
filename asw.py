@@ -32,16 +32,11 @@ socket = SocketIO(app, allow_upgrades=True, engineio_logger = True)
 
 
 # MySQL configurations
-app.config['MYSQL_DATABASE_USER'] = 'root'
-app.config['MYSQL_DATABASE_PASSWORD'] = 'halflife2'
-app.config['MYSQL_DATABASE_DB'] = 'asw'
-app.config['MYSQL_DATABASE_HOST'] = 'localhost'
+app.config['MYSQL_DATABASE_USER'] = ''
+app.config['MYSQL_DATABASE_PASSWORD'] = ''
+app.config['MYSQL_DATABASE_DB'] = ''
+app.config['MYSQL_DATABASE_HOST'] = ''
 mysql.init_app(app)
-
-#thread1 = emailSender(1, "emailSenderThread", 1)
-#thread1.start()
-#print threading.activeCount()
-#print threading.enumerate()
 
 #------------------------------------------------FLASK ROUTES------------------------------------------------
 

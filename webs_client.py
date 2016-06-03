@@ -1,6 +1,6 @@
 import xmlrpclib
 
-proxy = xmlrpclib.ServerProxy("http://46.101.66.111:8888/")
+proxy = xmlrpclib.ServerProxy("http:///")
 
 def valorAtual(n):
     return str(proxy.valorAtualDoItem(n))
@@ -26,13 +26,10 @@ while True:
         id = raw_input("Insira o id do leilao: ")
         valor = raw_input("Insira o valor da nova bid: ")
         username = raw_input("Insira o seu username: ")
-        password = raw_input("Insira a sea password: ")
+        password = raw_input("Insira a sua password: ")
         try:
             print licitaItem(int(id), float(valor), username, password)
         except TypeError:
             print 'os argumentos estao errados\n'
     else:
-        print "Opcao errada! Escolha valorAtualDoItem ou licitaItem\n"
-
-
-#print "100 e par: %s" % str(proxy.e_par(100))
+        print "Opcao errada! Escolha valorItem ou licitaItem\n"

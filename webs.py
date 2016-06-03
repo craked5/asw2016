@@ -4,7 +4,7 @@ import json
 
 def valorAtualDoItem(id):
 
-    url = 'http://163.172.132.51/php/valorActualDoItem'
+    url = ''
 
     data = {
         "id":id
@@ -19,7 +19,7 @@ def valorAtualDoItem(id):
 
 def licitaItem(id, valor, username, password):
 
-    url = 'http://163.172.132.51/php/licitaItem'
+    url = ''
 
     data = {
         "id":id,
