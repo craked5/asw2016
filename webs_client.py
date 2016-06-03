@@ -26,7 +26,7 @@ while True:
         id = raw_input("Insira o id do leilao: ")
         valor = raw_input("Insira o valor da nova bid: ")
         username = raw_input("Insira o seu username: ")
-        password = raw_input("Insira a sua password: ")
+        password = raw_input("Insira a sea password: ")
         try:
             print licitaItem(int(id), float(valor), username, password)
         except TypeError:

@@ -381,7 +381,7 @@ def perfil():
 
         auctions_dict_participate, last_bidders = db_utils_flask.get_auctions_participate(g.cur, session["username"])
 
-        #last_bidders_ended = {}
+        last_bidders_ended = {}
         aucts_dict_participate_end = {}
         auctions_dict_participate_final = {}
         for aucts in auctions_dict_participate:
@@ -395,16 +395,20 @@ def perfil():
                 image_path = db_utils_flask.get_leilao_image_by_id(g.cur, auctions_dict_participate[aucts][0])
                 image_path = image_path[1],
                 auct_temp_end = auctions_dict_participate[aucts] + image_path
-                aucts_dict_participate_end[auctions_dict_participate[0]] = auct_temp_end
-                #last_bidders_ended[auctions_dict_participate[0]] = last_bidders[auctions_dict_participate[0]]
+                print auct_temp_end
+                print auctions_dict_participate
+                aucts_dict_participate_end[auctions_dict_participate[aucts][0]] = auct_temp_end
+                print last_bidders
+                last_bidders_ended[auctions_dict_participate[aucts][0]] = last_bidders[auctions_dict_participate[aucts][0]]
 
+        print last_bidders_ended
         print auctions_dict_participate_final
 
         if filename[0] is True:
             res = make_response(render_template("profile.html", session_user_name=session["username"], user_info=user_info,
                                    auctions_info=auctions_dict, tags_info=tags_dict , datetime = datetime.datetime.today(),
                                     bid_auctions_ended=aucts_dict_participate_end, bid_auctions=auctions_dict_participate_final,
-                                    last_bidders=last_bidders, user_image_file=filename[1]))
+                                    last_bidders=last_bidders, user_image_file=filename[1], last_bidders_ended=last_bidders_ended))
             res.headers.set('Cache-Control', 'public, max-age=0')
             return res
         else:
@@ -412,7 +416,7 @@ def perfil():
                 render_template("profile.html", session_user_name=session["username"], user_info=user_info,
                                 auctions_info=auctions_dict, tags_info=tags_dict, datetime=datetime.datetime.today(),
                                 bid_auctions_ended=aucts_dict_participate_end, bid_auctions=auctions_dict_participate_final,
-                                last_bidders=last_bidders))
+                                last_bidders=last_bidders, last_bidders_ended=last_bidders_ended))
             res.headers.set('Cache-Control', 'public, max-age=0')
             return res
 
@@ -549,6 +553,7 @@ def licitaItem():
         return "Aceite"
     else:
         return "Nao Aceite - erro!"
+
 
 if __name__ == '__main__':
     socket.run(app, debug=True)

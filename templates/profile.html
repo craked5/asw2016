@@ -162,12 +162,12 @@
             <a>Os Meus Leiloes!</a>
         </h3>
         {% for item in auctions_info %}
-            <div class="col-xs-6 col-sm-4 portfolio-item">
+            <div class="col-xs-6 col-sm-4 portfolio-item" style="width:33%">
                 <a href="#">
                     {% if auctions_info[item][11] != '' %}
-                        <img class="img-responsive" src="{{ url_for('static', filename="imagens/"+auctions_info[item][11][0]) }}" alt="" title="" style="">
+                        <img class="img-responsive" src="{{ url_for('static', filename="imagens/"+auctions_info[item][11][0]) }}" alt="" title="" style="height:350px;">
                     {% else %}
-                        <img class="img-responsive" src="http://www.verdisreviews.com/wp-content/uploads/2015/08/usat-2012-auction.jpg" alt="" title="" style="">
+                        <img class="img-responsive" src="http://www.verdisreviews.com/wp-content/uploads/2015/08/usat-2012-auction.jpg" alt="" title="" style="height:350px;">
                     {% endif %}
                 </a>
                 <div class="col-md-6">
@@ -210,12 +210,12 @@
             <a>Os Leiloes em que estou a participar!</a>
         </h3>
         {% for bid_item in bid_auctions %}
-            <div class="col-xs-6 col-sm-4 portfolio-item">
+            <div class="col-xs-6 col-sm-4 portfolio-item" style="width: 33%">
                 <a href="#">
                     {% if bid_auctions[bid_item][11] != '' %}
-                        <img class="img-responsive" src="{{ url_for('static', filename="imagens/"+bid_auctions[bid_item][11][0]) }}" alt="" title="" style="">
+                        <img class="img-responsive" src="{{ url_for('static', filename="imagens/"+bid_auctions[bid_item][11][0]) }}" alt="" title="" style="height:350px;">
                     {% else %}
-                        <img class="img-responsive" src="http://www.verdisreviews.com/wp-content/uploads/2015/08/usat-2012-auction.jpg" alt="" title="" style="">
+                        <img class="img-responsive" src="http://www.verdisreviews.com/wp-content/uploads/2015/08/usat-2012-auction.jpg" alt="" title="" style="height:350px;">
                     {% endif %}
                 </a>
                 <div class="col-md-6">
@@ -248,12 +248,12 @@
             <a>Leiloes que acabaram e participei!</a>
         </h3>
         {% for bid_item_end in bid_auctions_ended %}
-            <div class="col-xs-6 col-sm-4 portfolio-item">
+            <div class="col-xs-6 col-sm-4 portfolio-item" style="width:33%">
                 <a href="#">
                     {% if bid_auctions_ended[bid_item_end][11] != '' %}
                         <img class="img-responsive" src="{{ url_for('static', filename="imagens/"+bid_auctions_ended[bid_item_end][11][0]) }}" alt="" title="" style="height: 350px;">
                     {% else %}
-                        <img class="img-responsive" src="http://www.verdisreviews.com/wp-content/uploads/2015/08/usat-2012-auction.jpg" alt="" title="" style="">
+                        <img class="img-responsive" src="http://www.verdisreviews.com/wp-content/uploads/2015/08/usat-2012-auction.jpg" alt="" title="" style="height:350px;">
                     {% endif %}
                 </a>
                 <div class="col-md-6">
